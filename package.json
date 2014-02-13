@@ -29,7 +29,9 @@
     "hubot-scripts": ">= 2.5.0 < 3.0.0",
     "jsdom":         "0.10.1",
     "jquery":         "2.1.0",
-    "githubot":       "0.2.0"
+    "githubot":       "0.5.0",
+    "ntwitter":       "0.5.0",
+    "underscore":     "1.6.0"
   },
 
   "engines": {
