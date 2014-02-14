@@ -4,19 +4,29 @@ _ = require 'underscore'
 class TargetProcess
   constructor: (@robot) ->
 
-  userInfoForMsg: (msg) ->
+  userInfoForMsg: (msg, config) ->
     info = @robot.brain.get('target-process')?.userInfoByUserId?[msg.message.user.id] || {}
 
     unless info.token? && info.userId?
-      msg.send """
-        Incomplete docking procedure. Try sending me a 'log in to tp as \
-        <username> password <password>' message so I can do things on your \
-        behalf!
-        """
+      unless config?.noErrors? == true
+        msg.send """
+          Incomplete docking procedure. Try sending me a 'log in to tp as \
+          <username> password <password>' message so I can do things on your \
+          behalf!
+          """
 
       null
     else
       info
+
+  updateUserInfoForMsg: (msg, updatedFields) ->
+    targetProcess = @robot.brain.get('target-process') || {}
+    targetProcess.userInfoByUserId ||= {}
+    info = (targetProcess.userInfoByUserId[msg.message.user.id] ||= {})
+
+    info[field] = value for field, value of updatedFields
+
+    @robot.brain.set 'target-process', targetProcess
 
   get: (msg, resource, config, callback) ->
     unless callback?
@@ -75,20 +85,18 @@ module.exports = (robot) ->
     targetProcess.get msg, 'Context', authorizationConfig, (result) ->
       targetProcessUserId = result.LoggedUser.Id
 
-      targetProcess = robot.brain.get('target-process') || {}
-      targetProcess.userInfoByUserId ||= {}
-      targetProcess.userInfoByUserId[msg.message.user.id] ||= {}
-      targetProcess.userInfoByUserId[msg.message.user.id].userId = targetProcessUserId
-      robot.brain.set 'target-process', targetProcess
+      targetProcess.updateUserInfoForMsg msg, userId: targetProcessUserId
+
+      if targetProcess.userInfoForMsg(msg, noErrors: true)
+        msg.send "Docking successful."
 
     targetProcess.get msg, 'Authentication', authorizationConfig, (result) ->
       token = result.Token
 
-      targetProcess = robot.brain.get('target-process') || {}
-      targetProcess.userInfoByUserId ||= {}
-      targetProcess.userInfoByUserId[msg.message.user.id] ||= {}
-      targetProcess.userInfoByUserId[msg.message.user.id].token = token
-      robot.brain.set 'target-process', targetProcess
+      targetProcess.updateUserInfoForMsg msg, token: token
+
+      if targetProcess.userInfoForMsg(msg, noErrors: true)
+        msg.send "Docking successful."
 
   entities =
     'stories': 'UserStories'
