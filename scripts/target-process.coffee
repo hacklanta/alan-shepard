@@ -123,5 +123,4 @@ module.exports = (robot) ->
     msg.send "Mission parameters established, launching..."
 
     userInfo = targetProcess.userInfoForMsg msg
-    if userInfo?
-      targetProcess.get msg, 'UserStories', query: { where: 'AssignedUser.Id is null' }
+    msg.send "Mock mission completed. Real mission still pending investigation of fuel flow control mechanism."
