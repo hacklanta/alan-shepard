@@ -118,7 +118,7 @@ module.exports = (robot) ->
         stories = result.Items
 
         if stories.length
-          storyString = stories.map((_) -> " - #{_.Name} (##{_.Id})").join("\n")
+          storyString = stories.map((_) -> " - #{_.Name} (id:#{_.Id})").join("\n")
 
           msg.send """
             Here are your #{entitySelector}:
