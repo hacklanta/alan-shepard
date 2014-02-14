@@ -24,9 +24,11 @@ class TargetProcess
 
     {query, headers} = config
 
-    {token} = @userInfoForMsg(msg)
     query ||= {}
-    query.token = token
+
+    unless config.noToken
+      {token} = @userInfoForMsg(msg)
+      query.token = token
 
     headers ||= {}
     headers['Accept'] ||= 'application/json'
@@ -68,7 +70,7 @@ module.exports = (robot) ->
 
     # base64 encode credentials
     encodedCredentials = new Buffer("#{username}:#{msg.match[2]}").toString('base64')
-    authorizationConfig = headers: { Authorization: "Basic #{encodedCredentials}" }
+    authorizationConfig = headers: { Authorization: "Basic #{encodedCredentials}" }, noToken: true
 
     targetProcess.get msg, 'Context', authorizationConfig, (result) ->
       targetProcessUserId = result.LoggedUser.Id
