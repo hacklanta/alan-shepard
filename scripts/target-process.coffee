@@ -88,13 +88,40 @@ module.exports = (robot) ->
       targetProcess.userInfoByUserId[msg.message.user.id].token = token
       robot.brain.set 'target-process', targetProcess
 
-  robot.respond /show me stories$/, (msg) ->
+  entities =
+    'stories': 'UserStories'
+    'bugs': 'Bugs'
+    'tasks': 'Tasks'
+
+  entityRegex = "(#{Object.keys(entities).join('|')})"
+
+  robot.respond ///show\s+(?:me\s+)?#{entityRegex}$///, (msg) ->
     msg.send "Mission parameters established, launching..."
 
-    userInfo = targetProcess.userInfoForMsg(msg)
+    userInfo = targetProcess.userInfoForMsg msg
 
     if userInfo?
-      targetProcess.get msg, 'UserStories', where: "AssignedUser.Id eq #{userInfo.userId}", (result) ->
+      entitySelector = msg.match[1]
+      entity = entities[entitySelector]
+
+      targetProcess.get msg, entity, query: { where: "AssignedUser.Id eq #{userInfo.userId}", include: "[Name]" }, (result) ->
         stories = result.Items
 
-  robot.respond /show me backlog$/
+        if stories.length
+          storyString = stories.map((_) -> " - #{_.Name} (##{_.Id})").join("\n")
+
+          msg.send """
+            Here are your #{entitySelector}:
+            #{storyString}
+          """
+        else
+          msg.send "You have no #{entitySelector}; aborting launch."
+
+  robot.respond /show (?:me )?stuff/, (msg) ->
+
+  robot.respond /show (me )?backlog$/, (msg) ->
+    msg.send "Mission parameters established, launching..."
+
+    userInfo = targetProcess.userInfoForMsg msg
+    if userInfo?
+      targetProcess.get msg, 'UserStories', query: { where: 'AssignedUser.Id is null' }
