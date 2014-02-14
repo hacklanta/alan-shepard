@@ -61,7 +61,7 @@ class TargetProcess
 module.exports = (robot) ->
   targetProcess = new TargetProcess(robot)
 
-  robot.respond /log me into tp as ([^ ]+) password ([^ ]+)$/i, (msg) ->
+  robot.respond /log in to tp as ([^ ]+) password ([^ ]+)$/i, (msg) ->
     msg.send "Engaging docking procedure; don't worry, I'll forget your password once I've got an auth token!"
 
     username = msg.match[1]
@@ -69,7 +69,6 @@ module.exports = (robot) ->
     # base64 encode credentials
     encodedCredentials = new Buffer("#{username}:#{msg.match[2]}").toString('base64')
     authorizationConfig = headers: { Authorization: "Basic #{encodedCredentials}" }
-
 
     targetProcess.get msg, 'Context', authorizationConfig, (result) ->
       targetProcessUserId = result.LoggedUser.Id
