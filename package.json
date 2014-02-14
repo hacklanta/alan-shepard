@@ -31,7 +31,8 @@
     "jquery":         "2.1.0",
     "githubot":       "0.5.0",
     "ntwitter":       "0.5.0",
-    "underscore":     "1.6.0"
+    "underscore":     "1.6.0",
+    "hubot-yardmaster": "*"
   },
 
   "engines": {
