@@ -5,12 +5,12 @@ class TargetProcess
   constructor: (@robot) ->
 
   userInfoForMsg: (msg) ->
-    info = @robot.brain.get('target-process')?.userInfoByUserId?[msg.message.user.id]
+    info = @robot.brain.get('target-process')?.userInfoByUserId?[msg.message.user.id] || {}
 
     unless info.token? && info.userId?
       msg.send """
-        Incomplete docking procedure. Try sending me a 'log me into tp as
-        <username> password <password>' message so I can do things on your
+        Incomplete docking procedure. Try sending me a 'log in to tp as \
+        <username> password <password>' message so I can do things on your \
         behalf!
         """
 
