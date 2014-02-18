@@ -27,16 +27,7 @@ class TargetProcess
 
     @robot.brain.set 'target-process', targetProcess
 
-  get: (msg, resource, config, callback) ->
-    unless callback?
-      callback = config
-
-    {query, headers} = config
-
-    token = undefined
-    unless config.noToken
-      {token} = @userInfoForMsg(msg)
-
+  buildRequest: (resource, headers, query, token) ->
     query ||= {}
 
     if token?
@@ -54,6 +45,18 @@ class TargetProcess
     
     base
       .query(query)
+
+  get: (msg, resource, config, callback) ->
+    unless callback?
+      callback = config
+
+    {query, headers} = config || {}
+
+    token = undefined
+    unless config.noToken
+      {token} = @userInfoForMsg(msg)
+
+    @buildRequest(resource, headers, query, token)
       .get() (err, res, body) ->
         if err?
           msg.send "It's all gone wrong, aborting mission! Got error: #{err}."
