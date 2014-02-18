@@ -99,6 +99,14 @@ module.exports = (robot) ->
         # Always post to UserStories--it doesn't matter, the comment
         # will go through to the appropriate entity anyway.
         targetProcess.post "UserStories/#{id}/Comments", comment
+        targetProcess.post "UserStories/#{id}",
+          Id: id
+          CustomFields: [
+            Name: "Pull Request"
+            Value:
+              Url: issueUrl
+              Label: "##{issueNumber} #{issueTitle}"
+          ]
 
     catch exception
       console.log "It's all gone wrong:", exception, exception.stack
