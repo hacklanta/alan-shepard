@@ -2,6 +2,7 @@ _ = require 'underscore'
 
 class TargetProcess
   constructor: (@robot) ->
+    @defaultToken = process.env['TARGET_PROCESS_TOKEN']
 
   userInfoForMsg: (msg, config) ->
     info = @robot.brain.get('target-process')?.userInfoByUserId?[msg.message.user.id] || {}
@@ -45,6 +46,19 @@ class TargetProcess
     
     base
       .query(query)
+
+  post: (resource, body, config, callback) ->
+    unless callback?
+      callback = config
+
+    {query, headers} = config || {}
+    headers ||= {}
+    headers['Content-Type'] = 'application/json; charset=utf-8'
+
+    bodyString = JSON.stringify(body)
+    @buildRequest(resource, headers, query, @defaultToken)
+      .post(bodyString) (err, res, body) ->
+        callback?(err, res, body)
 
   get: (msg, resource, config, callback) ->
     unless callback?
