@@ -12,7 +12,7 @@
 #   These commands are grabbed from comment blocks at the top of each file.
 
 helpSummary = [
-  'Type help <keyword> for specific help or "hubot full help" for entire list ',
+  'Type help <keyword> for specific help or "Alan full help" for entire list ',
   '',
   'Events',
   'Haters - Returns a random haters gonna hate url',
