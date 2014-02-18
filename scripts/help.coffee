@@ -11,6 +11,24 @@
 # Notes:
 #   These commands are grabbed from comment blocks at the top of each file.
 
+helpSummary = [
+  'Type help <keyword> for specific help or "hubot full help" for entire list ',
+  '',
+  'Events',
+  'Haters - Returns a random haters gonna hate url',
+  'Jenkins - Show Jobs. Show current branch for job. Change branch and build',
+  'Good List/Bad List - Show, add, remove from lists',
+  'Github - search github repo',
+  'Domain - Is domain up?'
+  'JoinMe - create join.me link/room',
+  'Generate Hash - Generate hash of string',
+  'Pomodoro - Start, stop, show details',
+  'Rabbit - Show nodes, queues, bindings, vhosts, etc',
+  'Tell - Tell someone something when they login next',
+  'Encode/Decode Url - URL encode or decode',
+  'Ship it - Ship it squirrel!'
+]
+
 helpContents = (name, commands) ->
 
   """
@@ -51,6 +69,16 @@ helpContents = (name, commands) ->
   """
 
 module.exports = (robot) ->
+  SendHelp = (typeOfhelp, msg) ->
+    prefix = robot.alias or robot.name
+    cmds = typeOfhelp.map (cmd) ->
+      cmd = cmd.replace /^hubot/, prefix
+      cmd.replace /hubot/ig, robot.name
+
+    emit = cmds.join "\n"
+
+    msg.send emit
+
   robot.respond /help\s*(.*)?$/i, (msg) ->
     cmds = robot.helpCommands()
     filter = msg.match[1]
@@ -61,15 +89,12 @@ module.exports = (robot) ->
       if cmds.length == 0
         msg.send "No available commands match #{filter}"
         return
-
-    prefix = robot.alias or robot.name
-    cmds = cmds.map (cmd) ->
-      cmd = cmd.replace /^hubot/, prefix
-      cmd.replace /hubot/ig, robot.name
-
-    emit = cmds.join "\n"
-
-    msg.send emit
+    
+    SendHelp helpSummary, msg
+    
+  robot.respond /full help$/i, (msg) ->
+    cmds = robot.helpCommands()
+    SendHelp cmds, msg
 
   robot.router.get "/#{robot.name}/help", (req, res) ->
     cmds = robot.helpCommands().map (cmd) ->
