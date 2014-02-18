@@ -108,6 +108,8 @@ module.exports = (robot) ->
               Label: "##{issueNumber} #{issueTitle}"
           ]
 
+      res.send 200, "Fired off requests to update #{entityIdsToUpdate} and close #{entityIdsToClose} from PR #{issueNumber}."
+
     catch exception
       console.log "It's all gone wrong:", exception, exception.stack
       res.send 500, "It's all gone wrong: #{Util.inspect exception}"
