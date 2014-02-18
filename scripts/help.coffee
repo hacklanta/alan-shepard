@@ -12,9 +12,6 @@
 #   These commands are grabbed from comment blocks at the top of each file.
 
 helpSummary = [
-  'Type help <keyword> for specific help or "Alan full help" for entire list ',
-  '',
-  'Events',
   'Haters - Returns a random haters gonna hate url',
   'Jenkins - Show Jobs. Show current branch for job. Change branch and build',
   'Good List/Bad List - Show, add, remove from lists',
@@ -75,7 +72,8 @@ module.exports = (robot) ->
       cmd = cmd.replace /^hubot/, prefix
       cmd.replace /hubot/ig, robot.name
 
-    emit = cmds.join "\n"
+    helpIntro = "Type help <keyword> for specific help or '#{prefix} full help' for entire list\n\n"
+    emit = helpIntro + cmds.join "\n"
 
     msg.send emit
 
