@@ -89,8 +89,9 @@ module.exports = (robot) ->
       if cmds.length == 0
         msg.send "No available commands match #{filter}"
         return
+    else cmds = helpSummary
     
-    SendHelp helpSummary, msg
+    SendHelp cmds, msg
     
   robot.respond /full help$/i, (msg) ->
     cmds = robot.helpCommands()
