@@ -118,6 +118,32 @@ module.exports = (robot) ->
                 Label: "##{issueNumber}: #{issueTitle}"
             ]
 
+      closeComment =
+        [
+          Description:
+            """
+            <div>
+              Completed by merging <a href="#{issueUrl}">##{issueNumber}: #{issueTitle}</a>.
+            </div>
+            """
+        ]
+      for id in entityIdsToClose
+        # Always post to UserStories--it doesn't matter, the comment
+        # will go through to the appropriate entity anyway.
+        targetProcess.post "UserStories/#{id}/Comments", closeComment
+        # For these, we fire off one POST to each entity type so the right one will take effect.
+        for entityType in ['UserStories','Bugs','Tasks']
+          targetProcess.post "#{entityType}/#{id}",
+            Id: id
+            EntityState:
+              closedStateByType[entityType]
+            CustomFields: [
+              Name: "Pull Request"
+              Value:
+                Url: issueUrl
+                Label: "##{issueNumber}: #{issueTitle}"
+            ]
+
       res.send 200, "Fired off requests to update #{entityIdsToUpdate} and close #{entityIdsToClose} from PR #{issueNumber}."
 
     catch exception
