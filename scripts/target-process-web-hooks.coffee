@@ -81,7 +81,7 @@ module.exports = (robot) ->
 
       [{number: issueNumber, title: issueTitle, html_url: issueUrl},
        entityIdsToUpdate, entityIdsToClose] =
-        if payload.pull_request?.merged_at and payload.action? == 'closed'
+        if payload.pull_request?.merged_at and payload.action == 'closed'
           # Only close entities if the pull request has been merged and
           # we're closing it.
           [payload.pull_request]
