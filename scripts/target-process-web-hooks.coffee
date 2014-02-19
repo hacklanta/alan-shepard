@@ -6,6 +6,17 @@ TargetProces = require '../lib/target-process'
 closeVerbs = ///#{['fix(?:es|ed)?','clos(?:es|ed)?','complet(?:es|ed)?','resolve(?:es|ed)?'].join('|')}///i
 updateVerbs = ///#{['update(?:[sd])?','mprove(?:[sd])?','address(?:e[sd])?','re(?:f(?:erence)?(?:s)?)?','see'].join('|')}///i
 
+closedStateByType =
+  UserStories:
+    Id: 2
+    Name: 'Done'
+  Tasks:
+    Id: 4
+    Name: 'Done'
+  Bugs:
+    Id: 6
+    Name: 'Fixed'
+
 entityRegex =
   ///
     ( # entity markers
