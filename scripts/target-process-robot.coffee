@@ -39,7 +39,7 @@ module.exports = (robot) ->
   entityRegex = "(#{Object.keys(entities).join('|')})"
 
   robot.respond ///show\s+(?:me\s+)?#{entityRegex}$///, (msg) ->
-    msg.send "Mission parameters established, launching..."
+    console.log "Mission parameters established for #{entityRegex} lookup, launching..."
 
     userInfo = targetProcess.userInfoForMsg msg
 
@@ -63,7 +63,7 @@ module.exports = (robot) ->
   robot.respond /show (?:me )?stuff/, (msg) ->
 
   robot.respond /show (me )?backlog$/, (msg) ->
-    msg.send "Mission parameters established, launching..."
+    console.log "Mission parameters established for backlog lookup, launching..."
 
     userInfo = targetProcess.userInfoForMsg msg
     msg.send "Mock mission completed. Real mission still pending investigation of fuel flow control mechanism."
