@@ -99,7 +99,7 @@ module.exports = (robot) ->
           Description:
             """
             <div>
-              Referenced from <a href="#{issueUrl}">##{issueNumber} #{issueTitle}</a>.
+              Referenced from <a href="#{issueUrl}">##{issueNumber}: #{issueTitle}</a>.
             </div>
             """
         ]
@@ -114,8 +114,8 @@ module.exports = (robot) ->
             Name: "Pull Request"
             Value:
               Url: issueUrl
-              Label: "##{issueNumber} #{issueTitle}"
           ]
+                Label: "##{issueNumber}: #{issueTitle}"
 
       res.send 200, "Fired off requests to update #{entityIdsToUpdate} and close #{entityIdsToClose} from PR #{issueNumber}."
 
