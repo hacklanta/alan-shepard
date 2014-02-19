@@ -94,7 +94,7 @@ module.exports = (robot) ->
           [undefined, [], []]
 
       # For some reason the TP API requires our comment to be in an array.
-      comment =
+      updateComment =
         [
           Description:
             """
@@ -103,19 +103,20 @@ module.exports = (robot) ->
             </div>
             """
         ]
-
       for id in entityIdsToUpdate
         # Always post to UserStories--it doesn't matter, the comment
         # will go through to the appropriate entity anyway.
-        targetProcess.post "UserStories/#{id}/Comments", comment
-        targetProcess.post "UserStories/#{id}",
-          Id: id
-          CustomFields: [
-            Name: "Pull Request"
-            Value:
-              Url: issueUrl
-          ]
+        targetProcess.post "UserStories/#{id}/Comments", updateComment
+        # For these, we fire off one POST to each entity type so the right one will take effect.
+        for entityType in ['UserStories','Bugs','Tasks']
+          targetProcess.post "#{entityType}/#{id}",
+            Id: id
+            CustomFields: [
+              Name: "Pull Request"
+              Value:
+                Url: issueUrl
                 Label: "##{issueNumber}: #{issueTitle}"
+            ]
 
       res.send 200, "Fired off requests to update #{entityIdsToUpdate} and close #{entityIdsToClose} from PR #{issueNumber}."
 
