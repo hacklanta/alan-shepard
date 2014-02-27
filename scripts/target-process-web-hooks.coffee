@@ -25,6 +25,7 @@ entityRegex =
       issue:|
       item:|
       entity:|
+      story:|
       bug:
     )
     (\d+) # entity id
