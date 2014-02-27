@@ -90,62 +90,66 @@ module.exports = (robot) ->
         else if payload.pull_request?
           [payload.pull_request, entitiesForUpdate(payload.pull_request.body), []]
         else if payload.comment?
+          pullRequestUrl = payload.comment.pull_request_url
           [payload.issue, entitiesForUpdate(payload.comment.body), []]
         else
-          [undefined, [], []]
+          [{ number: undefined, title: undefined, html_url: undefined }, [], []]
+      
+      if issueNumber?
+        # For some reason the TP API requires our comment to be in an array.
+        updateComment =
+          [
+            Description:
+              """
+              <div>
+                Referenced from <a href="#{issueUrl}">##{issueNumber}: #{issueTitle}</a>.
+              </div>
+              """
+          ]
+        for id in entityIdsToUpdate
+          # Always post to UserStories--it doesn't matter, the comment
+          # will go through to the appropriate entity anyway.
+          targetProcess.post "UserStories/#{id}/Comments", updateComment
+          # For these, we fire off one POST to each entity type so the right one will take effect.
+          for entityType in ['UserStories','Bugs','Tasks']
+            targetProcess.post "#{entityType}/#{id}",
+              Id: id
+              CustomFields: [
+                Name: "Pull Request"
+                Value:
+                  Url: issueUrl
+                  Label: "##{issueNumber}: #{issueTitle}"
+              ]
 
-      # For some reason the TP API requires our comment to be in an array.
-      updateComment =
-        [
-          Description:
-            """
-            <div>
-              Referenced from <a href="#{issueUrl}">##{issueNumber}: #{issueTitle}</a>.
-            </div>
-            """
-        ]
-      for id in entityIdsToUpdate
-        # Always post to UserStories--it doesn't matter, the comment
-        # will go through to the appropriate entity anyway.
-        targetProcess.post "UserStories/#{id}/Comments", updateComment
-        # For these, we fire off one POST to each entity type so the right one will take effect.
-        for entityType in ['UserStories','Bugs','Tasks']
-          targetProcess.post "#{entityType}/#{id}",
-            Id: id
-            CustomFields: [
-              Name: "Pull Request"
-              Value:
-                Url: issueUrl
-                Label: "##{issueNumber}: #{issueTitle}"
-            ]
+        closeComment =
+          [
+            Description:
+              """
+              <div>
+                Completed by merging <a href="#{issueUrl}">##{issueNumber}: #{issueTitle}</a>.
+              </div>
+              """
+          ]
+        for id in entityIdsToClose
+          # Always post to UserStories--it doesn't matter, the comment
+          # will go through to the appropriate entity anyway.
+          targetProcess.post "UserStories/#{id}/Comments", closeComment
+          # For these, we fire off one POST to each entity type so the right one will take effect.
+          for entityType in ['UserStories','Bugs','Tasks']
+            targetProcess.post "#{entityType}/#{id}",
+              Id: id
+              EntityState:
+                closedStateByType[entityType]
+              CustomFields: [
+                Name: "Pull Request"
+                Value:
+                  Url: issueUrl
+                  Label: "##{issueNumber}: #{issueTitle}"
+              ]
 
-      closeComment =
-        [
-          Description:
-            """
-            <div>
-              Completed by merging <a href="#{issueUrl}">##{issueNumber}: #{issueTitle}</a>.
-            </div>
-            """
-        ]
-      for id in entityIdsToClose
-        # Always post to UserStories--it doesn't matter, the comment
-        # will go through to the appropriate entity anyway.
-        targetProcess.post "UserStories/#{id}/Comments", closeComment
-        # For these, we fire off one POST to each entity type so the right one will take effect.
-        for entityType in ['UserStories','Bugs','Tasks']
-          targetProcess.post "#{entityType}/#{id}",
-            Id: id
-            EntityState:
-              closedStateByType[entityType]
-            CustomFields: [
-              Name: "Pull Request"
-              Value:
-                Url: issueUrl
-                Label: "##{issueNumber}: #{issueTitle}"
-            ]
-
-      res.send 200, "Fired off requests to update #{entityIdsToUpdate} and close #{entityIdsToClose} from PR #{issueNumber}."
+        res.send 200, "Fired off requests to update #{entityIdsToUpdate} and close #{entityIdsToClose} from PR #{issueNumber}."
+      else
+        res.send 400, "Expected an issue id but could not find one."
 
     catch exception
       console.log "It's all gone wrong:", exception, exception.stack
