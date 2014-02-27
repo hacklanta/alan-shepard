@@ -109,7 +109,8 @@ module.exports = (robot) ->
         for id in entityIdsToUpdate
           # Always post to UserStories--it doesn't matter, the comment
           # will go through to the appropriate entity anyway.
-          targetProcess.post "UserStories/#{id}/Comments", updateComment
+          targetProcess.post "UserStories/#{id}/Comments", updateComment,
+              (result) -> console.log "What? Got dat #{result}"
           # For these, we fire off one POST to each entity type so the right one will take effect.
           for entityType in ['UserStories','Bugs','Tasks']
             targetProcess.post "#{entityType}/#{id}",
@@ -119,7 +120,8 @@ module.exports = (robot) ->
                 Value:
                   Url: issueUrl
                   Label: "##{issueNumber}: #{issueTitle}"
-              ]
+              ],
+              (result) -> console.log "What? Got dat #{result}"
 
         closeComment =
           [
@@ -145,7 +147,8 @@ module.exports = (robot) ->
                 Value:
                   Url: issueUrl
                   Label: "##{issueNumber}: #{issueTitle}"
-              ]
+              ],
+              (result) -> console.log "What? Got dat #{result}"
 
         res.send 200, "Fired off requests to update #{entityIdsToUpdate} and close #{entityIdsToClose} from PR #{issueNumber}."
       else
