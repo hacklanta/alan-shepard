@@ -6,30 +6,30 @@ TargetProcess = require '../lib/target-process'
 module.exports = (robot) ->
   targetProcess = new TargetProcess(robot)
 
-  robot.respond /log in to tp as ([^ ]+) password ([^ ]+)$/i, (msg) ->
-    msg.send "Engaging docking procedure; don't worry, I'll forget your password once I've got an auth token!"
+  lookupUserInfoByFields = (msg, fields, value, callback) ->
+    if fields.length
+      targetProcess.get msg, "Users", query: { where: "#{fields.pop()} eq \"#{value}\"" }, (result) ->
+        if result.Items?.length
+          console.log 'Doin it for', msg.message.user.id, result.Items[0].Id
+          targetProcess.updateUserInfoForMsg msg, userId: result.Items[0].Id
 
-    username = msg.match[1]
+          callback? true
+        else
+          lookupUserInfoByFields msg, fields, value, callback
+    else
+      callback? false
 
-    # base64 encode credentials
-    encodedCredentials = new Buffer("#{username}:#{msg.match[2]}").toString('base64')
-    authorizationConfig = headers: { Authorization: "Basic #{encodedCredentials}" }, noToken: true
 
-    targetProcess.get msg, 'Context', authorizationConfig, (result) ->
-      targetProcessUserId = result.LoggedUser.Id
 
-      targetProcess.updateUserInfoForMsg msg, userId: targetProcessUserId
 
-      if targetProcess.userInfoForMsg(msg, noErrors: true)
-        msg.send "Docking successful."
+  robot.respond /I am ([^ ]+) in Target Process\.?$/i, (msg) ->
+    loginOrEmail = msg.match[1]
 
-    targetProcess.get msg, 'Authentication', authorizationConfig, (result) ->
-      token = result.Token
-
-      targetProcess.updateUserInfoForMsg msg, token: token
-
-      if targetProcess.userInfoForMsg(msg, noErrors: true)
-        msg.send "Docking successful."
+    lookupUserInfoByFields msg, ['Login', 'Email'], loginOrEmail, (succeeded) ->
+      if succeeded
+        msg.send "Great, I have you as #{loginOrEmail}!"
+      else
+        msg.send "I couldn't find #{loginOrEmail} in Target Process :( Make sure this is your login or email!"
 
   entities =
     'stories': 'UserStories'
