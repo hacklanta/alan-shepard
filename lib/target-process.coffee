@@ -1,3 +1,4 @@
+Util = require 'util'
 _ = require 'underscore'
 
 class TargetProcess
@@ -7,12 +8,11 @@ class TargetProcess
   userInfoForMsg: (msg, config) ->
     info = @robot.brain.get('target-process')?.userInfoByUserId?[msg.message.user.id] || {}
 
-    unless info.token? && info.userId?
+    unless info.userId?
       unless config?.noErrors? == true
         msg.send """
-          Incomplete docking procedure. Try sending me a 'log in to tp as \
-          <username> password <password>' message so I can do things on your \
-          behalf!
+          Incomplete docking procedure. Try sending me a 'I am <login> in Target Process'
+          so I know who to look for in Target Process!
           """
 
       null
@@ -43,7 +43,7 @@ class TargetProcess
         (base, header) -> base.header(header, headers[header]),
         @robot.http("https://elemica.tpondemand.com/api/v1/#{resource}")
       )
-    
+
     base
       .query(query)
 
@@ -66,9 +66,9 @@ class TargetProcess
 
     {query, headers} = config || {}
 
-    token = undefined
-    unless config.noToken
-      {token} = @userInfoForMsg(msg)
+    token =
+      unless config.noToken
+        @defaultToken
 
     @buildRequest(resource, headers, query, token)
       .get() (err, res, body) ->
