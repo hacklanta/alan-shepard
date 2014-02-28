@@ -19,8 +19,16 @@ module.exports = (robot) ->
     else
       callback? false
 
+  lookupEntitiesByAssignedUserId = (msg, userId, entityTypes, callback, stories) ->
+    stories ||= []
 
+    if entityTypes.length
+      targetProcess.get msg, entityTypes.shift(), query: { where: "AssignedUser.Id eq #{userId}", include: "[Name]" }, (result) ->
+        matchingStories = result.Items
 
+        lookupEntitiesByAssignedUserId msg, userId, entityTypes, callback, stories.concat(matchingStories || [])
+    else
+      callback? stories
 
   robot.respond /I am ([^ ]+) in Target Process\.?$/i, (msg) ->
     loginOrEmail = msg.match[1]
@@ -36,23 +44,22 @@ module.exports = (robot) ->
     'bugs': 'Bugs'
     'tasks': 'Tasks'
 
-  entityRegex = "(#{Object.keys(entities).join('|')})"
+  entityNames = Object.keys(entities)
+  entityRegex = "(#{entityNames.join('|')})"
+  entityTypes = (entity for _, entity of entities)
 
   robot.respond ///show\s+(?:me\s+)?#{entityRegex}$///, (msg) ->
     console.log "Mission parameters established for #{entityRegex} lookup, launching..."
 
     userInfo = targetProcess.userInfoForMsg msg
-
     if userInfo?
       entitySelector = msg.match[1]
       entity = entities[entitySelector]
 
-      targetProcess.get msg, entity, query: { where: "AssignedUser.Id eq #{userInfo.userId}", include: "[Name]" }, (result) ->
-        stories = result.Items
+      lookupEntitiesByAssignedUserId msg, userInfo.userId, [entity], (stories) ->
+        storyString = stories.map((_) -> " - #{_.Name} (id:#{_.Id}, http://elemica.tpondemand.com/entity/#{_.Id})").join("\n")
 
         if stories.length
-          storyString = stories.map((_) -> " - #{_.Name} (id:#{_.Id})").join("\n")
-
           msg.send """
             Here are your #{entitySelector}:
             #{storyString}
@@ -60,7 +67,24 @@ module.exports = (robot) ->
         else
           msg.send "You have no #{entitySelector}; aborting launch."
 
-  robot.respond /show (?:me )?stuff/, (msg) ->
+  robot.respond /show (?:me )?(?:stuff|everything)\.?$/, (msg) ->
+    console.log "Mission parameters established for everything lookup, launching..."
+
+    userInfo = targetProcess.userInfoForMsg msg
+    if userInfo?
+      entityTypes = (entity for _, entity of entities)
+
+      lookupEntitiesByAssignedUserId msg, userInfo.userId, entityTypes, (stories) ->
+        storyString = stories.map((_) -> " - #{_.Name} (id:#{_.Id}, http://elemica.tpondemand.com/entity/#{_.Id})").join("\n")
+
+        entityLabel = entityNames.join(", ").replace(/, ([^,]+)$/, ', and $1')
+        if stories.length
+          msg.send """
+            Here are your #{entityLabel}:
+            #{storyString}
+          """
+        else
+          msg.send "You have no #{entityLabel}; aborting launch."
 
   robot.respond /show (me )?backlog$/, (msg) ->
     console.log "Mission parameters established for backlog lookup, launching..."
