@@ -1,7 +1,11 @@
 Util = require 'util'
 _ = require 'underscore'
+_.str = require('underscore.string');
 
 TargetProces = require '../lib/target-process'
+
+TARGET_PROCESS_HOST = process.env['TARGET_PROCESS_HOST']
+GITHUB_TOKEN = process.env['GITHUB_TOKEN']
 
 closeVerbs = ///#{['fix(?:es|ed)?','clos(?:es|ed)?','complet(?:es|ed)?','resolve(?:es|ed)?'].join('|')}///i
 updateVerbs = ///#{['update(?:[sd])?','mprove(?:[sd])?','address(?:e[sd])?','re(?:f(?:erence)?(?:s)?)?','see'].join('|')}///i
@@ -29,6 +33,7 @@ entityRegex =
       bug:
     )
     (\d+) # entity id
+    \]? # present if this mention has already been hyperlinked in Github
   ///ig
 
 updateRegex =
@@ -49,8 +54,8 @@ updateRegex =
 entitiesForUpdate = (string) ->
   _.flatten(
     while match = updateRegex.exec(string)
-      while entityMatch = entityRegex.exec(match[0])
-        entityMatch[2] 
+      while entityMatch = entityRegex.exec(match[0]) when ! _.str.endsWith(entityMatch[0], ']')
+        entityMatch[2]
   )
 
 # Finds both closing and updating references and adds a comment to the
@@ -68,10 +73,55 @@ entitiesForUpdateAndClose = (string) ->
       else if match[1].match closeVerbs
         entityIdsToClose
 
-    while entityMatch = entityRegex.exec(match[0])
+    while entityMatch = entityRegex.exec(match[0]) when ! _.str.endsWith(entityMatch[0], ']')
       collection.push entityMatch[2]
 
   [entityIdsToUpdate, entityIdsToClose]
+
+# Updates the specified body with links to the specified ids if they are
+# referenced anywhere without already being linked.
+updateBodyWithEntityLinks = (body, entityIdsToLink) ->
+  console.log 'replacing in', body, 'with', entityIdsToLink
+  body.replace updateRegex, (updateString, updateVerb, entityMarker, entityId) ->
+    updateString.replace entityRegex, (entityMention, entityMarker, entityId) ->
+      if entityIdsToLink.indexOf(entityId) > -1 && ! _.str.endsWith(entityMention, ']')
+        "[#{entityMention}](#{TARGET_PROCESS_HOST}/entity/#{entityId})"
+      else
+        entityMention
+
+
+# Given a pull request body, id, and list of entity ids, update the pull
+# request body to link references to those entity ids to their entries in
+# Target Process.
+addLinksToPullRequest = (pullRequestBody) -> (robot, pullRequestId, entityIds) ->
+  updatedBody = updateBodyWithEntityLinks pullRequestBody, entityIds
+
+  console.log 'putting', updatedBody, 'to', pullRequestId
+  # put to Github the updated body
+  robot
+    .http("https://api.github.com/repos/elemica/mercury/issues/#{pullRequestId}")
+    .header('Authorization', "token #{GITHUB_TOKEN}")
+    .header('Accept', 'application/json')
+    .patch(JSON.stringify(
+      body: updatedBody
+    )) (err, res, body) ->
+      if err?
+        console.log "It's all gone wrong... Got: #{res}"
+
+addLinksToComment = (commentId, commentBody) -> (robot, pullRequestId, entityIds) ->
+  updatedBody = updateBodyWithEntityLinks commentBody, entityIds
+
+  console.log 'putting', updatedBody, 'to', commentId
+  # put to Github the updated body
+  robot
+    .http("https://api.github.com/repos/elemica/mercury/issues/comments/#{commentId}")
+    .header('Authorization', "token #{GITHUB_TOKEN}")
+    .header('Accept', 'application/json')
+    .patch(JSON.stringify(
+      body: updatedBody
+    )) (err, res, body) ->
+      if err?
+        console.log "It's all gone wrong... Got: #{res}"
 
 module.exports = (robot) ->
   targetProcess = new TargetProces(robot)
@@ -81,19 +131,20 @@ module.exports = (robot) ->
       payload = JSON.parse req.param('payload')
 
       [{number: issueNumber, title: issueTitle, html_url: issueUrl},
-       entityIdsToUpdate, entityIdsToClose] =
+       linkAdderFn, entityIdsToUpdate, entityIdsToClose] =
         if payload.pull_request?.merged_at and payload.action == 'closed'
           # Only close entities if the pull request has been merged and
           # we're closing it.
-          [payload.pull_request]
+          [payload.pull_request, addLinksToPullRequest(payload.pull_request.body)]
             .concat entitiesForUpdateAndClose(payload.pull_request.body)
         else if payload.pull_request?
-          [payload.pull_request, entitiesForUpdate(payload.pull_request.body), []]
+          [payload.pull_request, addLinksToPullRequest(payload.pull_request.body),
+            entitiesForUpdate(payload.pull_request.body), []]
         else if payload.comment?
-          pullRequestUrl = payload.comment.pull_request_url
-          [payload.issue, entitiesForUpdate(payload.comment.body), []]
+          [payload.issue, addLinksToComment(payload.comment.id, payload.comment.body),
+            entitiesForUpdate(payload.comment.body), []]
         else
-          [{ number: undefined, title: undefined, html_url: undefined }, [], []]
+          [{ number: undefined, title: undefined, html_url: undefined }, (->), [], []]
       
       if issueNumber?
         # For some reason the TP API requires our comment to be in an array.
@@ -149,6 +200,8 @@ module.exports = (robot) ->
                   Label: "##{issueNumber}: #{issueTitle}"
               ],
               (err, result, body) -> console.log "What? Got dat", body
+
+        linkAdderFn(robot, issueNumber, entityIdsToUpdate)
 
         res.send 200, "Fired off requests to update #{entityIdsToUpdate} and close #{entityIdsToClose} from PR #{issueNumber}."
       else
