@@ -32,6 +32,7 @@
     "githubot":       "0.5.0",
     "ntwitter":       "0.5.0",
     "underscore":     "1.6.0",
+    "underscore.string": "2.3.3",
     "hubot-yardmaster": "*",
     "flip":           "~0.1.0"
   },
