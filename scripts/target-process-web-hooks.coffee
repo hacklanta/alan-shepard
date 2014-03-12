@@ -7,8 +7,8 @@ TargetProces = require '../lib/target-process'
 TARGET_PROCESS_HOST = process.env['TARGET_PROCESS_HOST']
 GITHUB_TOKEN = process.env['GITHUB_TOKEN']
 
-closeVerbs = ///#{['fix(?:es|ed)?','clos(?:es|ed)?','complet(?:es|ed)?','resolve(?:es|ed)?'].join('|')}///i
-updateVerbs = ///#{['update(?:[sd])?','mprove(?:[sd])?','address(?:e[sd])?','re(?:f(?:erence)?(?:s)?)?','see'].join('|')}///i
+closeVerbs = ///#{['fix(?:es|ed)?','clos(?:es|ed)?','complet(?:es|ed)?','resolve(?:es|ed)?','implement(?:s|ed)?'].join('|')}///i
+updateVerbs = ///#{['update(?:[sd])?','improve(?:[sd])?','address(?:e[sd])?','re(?:f(?:erence)?(?:s)?)?','see'].join('|')}///i
 
 closedStateByType =
   UserStories:
