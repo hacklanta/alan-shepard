@@ -23,6 +23,7 @@ closedStateByType =
 
 entityRegex =
   ///
+    \[? # present if this mention has already been hyperlinked in Github
     ( # entity markers
       \#|
       ticket:|
@@ -45,6 +46,7 @@ updateRegex =
     \s+ # at least one space
     (?: # 1+ entities
       #{entityRegex.source}
+      (?:\([^)]+\))? # present if this mention has already been hyperlinked in Github
       (?:,\s*(?:and\s)?|\sand\s)? # combined either by ","; ", and"; or just "and"
     )+
   ///ig
