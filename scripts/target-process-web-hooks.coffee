@@ -56,8 +56,8 @@ updateRegex =
 entitiesForUpdate = (string) ->
   _.flatten(
     while match = updateRegex.exec(string)
-      while entityMatch = entityRegex.exec(match[0]) when ! _.str.endsWith(entityMatch[0], ']')
-        entityMatch[2]
+      while entityMatch = entityRegex.exec(match[0]) #when ! _.str.endsWith(entityMatch[0], ']')
+        "Don't update entity: #{entityMatch[2]}"
   )
 
 # Finds both closing and updating references and adds a comment to the
