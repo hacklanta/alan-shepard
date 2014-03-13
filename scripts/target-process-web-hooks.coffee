@@ -69,14 +69,17 @@ entitiesForUpdateAndClose = (string) ->
   [entityIdsToUpdate, entityIdsToClose] = [[], []]
 
   while match = updateRegex.exec(string)
-    collection =
-      if match[1].match updateVerbs
-        entityIdsToUpdate
-      else if match[1].match closeVerbs
-        entityIdsToClose
+    # Note: below, close entities are always reported, while update
+    # entities are only reported if they haven't been linked in
+    # Github (since we only want to update an entity once if it's just
+    # mentioned).
+    if match[1].match updateVerbs
+      while entityMatch = entityRegex.exec(match[0]) when ! _.str.endsWith(entityMatch[0], ']')
+        entityIdsToUpdate.push entityMatch[2]
+    else if match[1].match closeVerbs
+      while entityMatch = entityRegex.exec(match[0])
+        entityIdsToClose.push entityMatch[2]
 
-    while entityMatch = entityRegex.exec(match[0]) when ! _.str.endsWith(entityMatch[0], ']')
-      collection.push entityMatch[2]
 
   [entityIdsToUpdate, entityIdsToClose]
 
