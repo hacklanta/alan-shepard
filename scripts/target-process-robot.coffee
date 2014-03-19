@@ -3,6 +3,17 @@ _ = require 'underscore'
 
 TargetProcess = require '../lib/target-process'
 
+closedStateByType =
+  UserStories:
+    Id: 2
+    Name: 'Done'
+  Tasks:
+    Id: 4
+    Name: 'Done'
+  Bugs:
+    Id: 8
+    Name: 'Closed'
+
 module.exports = (robot) ->
   targetProcess = new TargetProcess(robot)
 
@@ -23,7 +34,13 @@ module.exports = (robot) ->
     stories ||= []
 
     if entityTypes.length
-      targetProcess.get msg, entityTypes.shift(), query: { where: "AssignedUser.Id eq #{userId}", include: "[Name]" }, (result) ->
+      entityType = entityTypes.shift()
+      closedStateId = closedStateByType[entityType].Id
+
+      conditions = "(AssignedUser.Id eq #{userId}) and (EntityState.Id ne #{closedStateId})"
+      console.log("Running with #{conditions}")
+
+      targetProcess.get msg, entityType, query: { where: conditions, include: "[Name]" }, (result) ->
         matchingStories = result.Items
 
         lookupEntitiesByAssignedUserId msg, userId, entityTypes, callback, stories.concat(matchingStories || [])
