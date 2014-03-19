@@ -57,7 +57,7 @@ module.exports = (robot) ->
       entity = entities[entitySelector]
 
       lookupEntitiesByAssignedUserId msg, userInfo.userId, [entity], (stories) ->
-        storyString = stories.map((_) -> " - #{_.Name} (id:#{_.Id}, http://elemica.tpondemand.com/entity/#{_.Id})").join("\n")
+        storyString = stories.map((_) -> " - #{_.Name} (id:#{_.Id}, https://elemica.tpondemand.com/entity/#{_.Id})").join("\n")
 
         if stories.length
           msg.send """
@@ -75,7 +75,7 @@ module.exports = (robot) ->
       entityTypes = (entity for _, entity of entities)
 
       lookupEntitiesByAssignedUserId msg, userInfo.userId, entityTypes, (stories) ->
-        storyString = stories.map((_) -> " - #{_.Name} (id:#{_.Id}, http://elemica.tpondemand.com/entity/#{_.Id})").join("\n")
+        storyString = stories.map((_) -> " - #{_.Name} (id:#{_.Id}, https://elemica.tpondemand.com/entity/#{_.Id})").join("\n")
 
         entityLabel = entityNames.join(", ").replace(/, ([^,]+)$/, ', and $1')
         if stories.length
