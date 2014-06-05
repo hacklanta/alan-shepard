@@ -18,8 +18,8 @@ closedStateByType =
     Id: 4
     Name: 'Done'
   Bugs:
-    Id: 6
-    Name: 'Fixed'
+    Id: 8
+    Name: 'Closed'
 
 entityRegex =
   ///
