@@ -23,7 +23,8 @@ helpSummary = [
   'Rabbit - Show nodes, queues, bindings, vhosts, etc',
   'Tell - Tell someone something when they login next',
   'Encode/Decode Url - URL encode or decode',
-  'Ship it - Ship it squirrel!'
+  'Ship it - Ship it squirrel!',
+  'Gif - Store, retrieve, remove gif Urls' 
 ]
 
 helpContents = (name, commands) ->
