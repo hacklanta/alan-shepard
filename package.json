@@ -34,6 +34,7 @@
     "underscore":     "1.6.0",
     "underscore.string": "2.3.3",
     "hubot-yardmaster": "*",
+    "hubot-gif-locker": "*",
     "flip":           "~0.1.0"
   },
 
