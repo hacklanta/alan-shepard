@@ -8,4 +8,4 @@ module.exports = (robot) ->
         exec "bash /home/jenkins/scripts/jenkins-env-show.sh -E #{awsEnv}", (error, stdout, stderr) ->
           msg.send(stdout)
       else
-        msg.reply "Sorry! You didn't enter a valid aws environment, try again."
+        msg.reply "Sorry! You didn't enter a valid Mercury environment, try again."
