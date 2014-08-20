@@ -6,7 +6,7 @@ module.exports = (robot) ->
     switch awsEnv
       when "dev", "stg", "prd", "if-team-dev", "router-dublin-dev", "router-oregon-stg", "router-integration-stg"
         msg.send("Fetching the server list for #{awsEnv}, don't panic this may take a moment:")
-        exec "bash /Users/sthompson/Documents/Elemica/scripts/show-servers.sh -E #{awsEnv}", (error, stdout, stderr) ->
+        exec "bash /home/jenkins/scripts/jenkins-env-show.sh -E #{awsEnv}", (error, stdout, stderr) ->
           msg.send(stdout)
       else
         msg.reply "Sorry! You didn't enter a valid Mercury environment, try again."
