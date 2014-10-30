@@ -31,7 +31,8 @@ entityRegex =
       item:|
       entity:|
       story:|
-      bug:
+      bug:|
+      task:
     )
     (\d+) # entity id
     \]? # present if this mention has already been hyperlinked in Github
