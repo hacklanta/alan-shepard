@@ -98,13 +98,13 @@ updateBodyWithEntityLinks = (body, entityIdsToLink) ->
 # Given a pull request body, id, and list of entity ids, update the pull
 # request body to link references to those entity ids to their entries in
 # Target Process.
-addLinksToPullRequest = (pullRequestBody) -> (robot, pullRequestId, entityIds) ->
+addLinksToPullRequest = (pullRequestUrl, pullRequestBody) -> (robot, pullRequestId, entityIds) ->
   updatedBody = updateBodyWithEntityLinks pullRequestBody, entityIds
 
   console.log 'putting', updatedBody, 'to', pullRequestId
   # put to Github the updated body
   robot
-    .http("https://api.github.com/repos/elemica/mercury/issues/#{pullRequestId}")
+    .http(pullRequestUrl)
     .header('Authorization', "token #{GITHUB_TOKEN}")
     .header('Accept', 'application/json')
     .patch(JSON.stringify(
@@ -113,13 +113,13 @@ addLinksToPullRequest = (pullRequestBody) -> (robot, pullRequestId, entityIds) -
       if err?
         console.log "It's all gone wrong... Got: #{res}"
 
-addLinksToComment = (commentId, commentBody) -> (robot, pullRequestId, entityIds) ->
+addLinksToComment = (commentUrl, commentId, commentBody) -> (robot, pullRequestId, entityIds) ->
   updatedBody = updateBodyWithEntityLinks commentBody, entityIds
 
   console.log 'putting', updatedBody, 'to', commentId
   # put to Github the updated body
   robot
-    .http("https://api.github.com/repos/elemica/mercury/issues/comments/#{commentId}")
+    .http(commentUrl)
     .header('Authorization', "token #{GITHUB_TOKEN}")
     .header('Accept', 'application/json')
     .patch(JSON.stringify(
@@ -140,13 +140,13 @@ module.exports = (robot) ->
         if payload.pull_request?.merged_at and payload.action == 'closed'
           # Only close entities if the pull request has been merged and
           # we're closing it.
-          [payload.pull_request, addLinksToPullRequest(payload.pull_request.body)]
+          [payload.pull_request, addLinksToPullRequest(payload.pull_request.url, payload.pull_request.body)]
             .concat entitiesForUpdateAndClose(payload.pull_request.body)
         else if payload.pull_request?
-          [payload.pull_request, addLinksToPullRequest(payload.pull_request.body),
+          [payload.pull_request, addLinksToPullRequest(payload.pull_request.url, payload.pull_request.body),
             entitiesForUpdate(payload.pull_request.body), []]
         else if payload.comment?
-          [payload.issue, addLinksToComment(payload.comment.id, payload.comment.body),
+          [payload.issue, addLinksToComment(payload.comment.url, payload.comment.id, payload.comment.body),
             entitiesForUpdate(payload.comment.body), []]
         else
           [{ number: undefined, title: undefined, html_url: undefined }, (->), [], []]
