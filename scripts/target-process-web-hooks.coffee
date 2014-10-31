@@ -10,6 +10,17 @@ GITHUB_TOKEN = process.env['GITHUB_TOKEN']
 closeVerbs = ///#{['fix(?:e[sd])?','close[sd]?','complete[sd]?','resolve[sd]?','implement(?:s|ed)?'].join('|')}///i
 updateVerbs = ///#{['update[sd]?','improve[sd]?','address(?:e[sd])?','re(?:f(?:erence)?(?:s)?)?','see'].join('|')}///i
 
+inProgressStateByType =
+  UserStories:
+    Id: 67
+    Name: 'In Progress'
+  Tasks:
+    Id: 69
+    Name: 'In Progress'
+  Bugs:
+    Id: 70
+    Name: 'In Progress'
+
 closedStateByType =
   UserStories:
     Id: 2
@@ -172,6 +183,8 @@ module.exports = (robot) ->
           for entityType in ['UserStories','Bugs','Tasks']
             targetProcess.post "#{entityType}/#{id}",
               Id: id
+              EntityState:
+                inProgressStateByType[entityType]
               CustomFields: [
                 Name: "Pull Request"
                 Value:
