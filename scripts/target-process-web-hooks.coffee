@@ -132,7 +132,7 @@ addLinksToComment = (commentUrl, commentId, commentBody) -> (robot, pullRequestI
   # put to Github the updated body
   robot
     .http(commentUrl)
-    .header('Authorization', "token #{GITHUB_TOKEN}")
+    .header('authorization', "token #{github_token}")
     .header('Accept', 'application/json')
     .patch(JSON.stringify(
       body: updatedBody
@@ -145,6 +145,14 @@ module.exports = (robot) ->
 
   robot.router.post '/pull-request-activity', (req, res) ->
     console.log "BOOM SHAKALAKAH"
+    robot
+      .http("https://api.github.com/repos/elemica/mercury/pulls/3652/files")
+      .header('authorization', "token #{github_token}")
+      .get() (err, res, body) ->
+        if err
+          robot.send "Encountered an erro :( #{err}"
+        else
+          console.log("VERY VERY VERY BOOM SHAKALAKAH")
 
   robot.router.post '/target-process/pull-request', (req, res) ->
     try
