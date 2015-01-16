@@ -146,19 +146,21 @@ module.exports = (robot) ->
   robot.router.post '/pull-request-activity', (req, res) ->
     console.log "pull-request-activity HIT"
 
-    payload = JSON.parse req.param('payload')
-    console.log ">>>>>>>>> payload: " + Util.inspect(payload)
+    console.log ">>>>>>>>> params: " + req.params
 
-    robot
-      .http("https://api.github.com/repos/elemica/mercury/pulls/3652/files")
-      .header('authorization', "token #{GITHUB_TOKEN}")
-      .get() (err, res, body) ->
-        if err
-          robot.send "Encountered an erro :( #{err}"
-        else
-          console.log "GET files callback returned"
-          console.log ">>>> res: " + Util.inspect(res)
-          console.log ">>>> body: " + Util.inspect(body)
+    #payload = JSON.parse req.param('payload')
+    #console.log ">>>>>>>>> payload: " + Util.inspect(payload)
+
+    #robot
+      #.http("https://api.github.com/repos/elemica/mercury/pulls/3652/files")
+      #.header('authorization', "token #{GITHUB_TOKEN}")
+      #.get() (err, res, body) ->
+        #if err
+          #robot.send "Encountered an erro :( #{err}"
+        #else
+          #console.log "GET files callback returned"
+          #console.log ">>>> res: " + Util.inspect(res)
+          #console.log ">>>> body: " + Util.inspect(body)
 
   robot.router.post '/target-process/pull-request', (req, res) ->
     try
