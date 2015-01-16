@@ -146,7 +146,7 @@ module.exports = (robot) ->
   robot.router.post '/pull-request-activity', (req, res) ->
     console.log "pull-request-activity HIT"
 
-    console.log ">>>>>>>>> params: " + req.params
+    console.log ">>>>>>>>> params: " + req
 
     #payload = JSON.parse req.param('payload')
     #console.log ">>>>>>>>> payload: " + Util.inspect(payload)
