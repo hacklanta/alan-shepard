@@ -149,7 +149,7 @@ module.exports = (robot) ->
     console.log ">>>> res: " + Util.inspect(res)
 
     payload = JSON.parse req.param('payload')
-    consold.log ">>>>>>>>> payload: " + Util.inspect(payload)
+    console.log ">>>>>>>>> payload: " + Util.inspect(payload)
 
     robot
       .http("https://api.github.com/repos/elemica/mercury/pulls/3652/files")
@@ -159,8 +159,8 @@ module.exports = (robot) ->
           robot.send "Encountered an erro :( #{err}"
         else
           console.log "GET files callback returned"
-          console.log ">>>> res: " + Util.inspect(res)
-          console.log ">>>> body: " + Util.inspect(body)
+          console.log "res: " + Util.inspect(res)
+          console.log "body: " + Util.inspect(body)
 
   robot.router.post '/target-process/pull-request', (req, res) ->
     try
