@@ -145,8 +145,8 @@ module.exports = (robot) ->
 
   robot.router.post '/pull-request-activity', (req, res) ->
     console.log "pull-request-activity HIT"
-    console.log "req: " + util.inspect(req)
-    console.log "res: " + util.inspect(res)
+    console.log "req: " + Util.inspect(req)
+    console.log "res: " + Util.inspect(res)
 
     robot
       .http("https://api.github.com/repos/elemica/mercury/pulls/3652/files")
@@ -156,8 +156,8 @@ module.exports = (robot) ->
           robot.send "Encountered an erro :( #{err}"
         else
           console.log "GET files callback returned"
-          console.log "res: " + util.inspect(res)
-          console.log "body: " + util.inspect(body)
+          console.log "res: " + Util.inspect(res)
+          console.log "body: " + Util.inspect(body)
 
   robot.router.post '/target-process/pull-request', (req, res) ->
     try
