@@ -143,6 +143,9 @@ addLinksToComment = (commentUrl, commentId, commentBody) -> (robot, pullRequestI
 module.exports = (robot) ->
   targetProcess = new TargetProces(robot)
 
+  robot.router.post '/pull-request-activity', (req, res) ->
+    console.log "BOOM SHAKALAKAH"
+
   robot.router.post '/target-process/pull-request', (req, res) ->
     try
       payload = JSON.parse req.param('payload')
