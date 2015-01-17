@@ -80,10 +80,9 @@ module.exports = (robot) ->
             if err
               robot.send "Encountered and error :( ${err}"
             else
-              #parsedBody = JSON.parse(body)
-              #parsedRes = JSON.parse(res)
-              #length = body.length
-              console.log "--- GET files returned " #+ length + " files"
+              data = JSON.parse(body)
+              length = data.length
+              console.log "--- GET files returned " + length + " files"
               console.log "--- --- body: " + body
               console.log "--- ---  res: " + res
               #for file in body
