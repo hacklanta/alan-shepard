@@ -80,9 +80,9 @@ module.exports = (robot) ->
             if err
               robot.send "Encountered and error :( ${err}"
             else
-              length = res.length
+              length = body.length
               console.log "--- GET files returned " + length + " files"
-              for file in res
+              for file in body
                 console.log "--- --- filename: " + file.filename
 
       else
