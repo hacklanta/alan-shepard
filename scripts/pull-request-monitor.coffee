@@ -64,9 +64,10 @@ module.exports = (robot) ->
     console.log "pull-request-activity HIT"
 
     try
-      payload = JSON.parse req.param('payload')
+      console.log req.body['number']
+      console.log req.body['pull_request']['head']['repo']['name']
 
-      console.log payload.number + " ============ number"
+      #console.log payload.number + " ============ number"
 
       #payload = JSON.parse req.param('payload')
       #console.log ">>>>>>>>> payload: " + Util.inspect(payload)
