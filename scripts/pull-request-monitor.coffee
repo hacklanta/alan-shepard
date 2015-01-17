@@ -73,6 +73,18 @@ module.exports = (robot) ->
       if action == "opened" || "reopened" || "synchronized"
         console.log "--- found PR to act upon"
         console.log "---   need to GET file info"
+        robot
+          .http("https://api.github.com/repos/elemica/mercury/pulls/" + number + "/files")
+          .header('authorization', "token #{GITHUB_TOKEN}")
+          .get() (err, res, body) ->
+            if err
+              robot.send "Encountered and error :( ${err}"
+            else
+              length = res.length
+              console.log "--- GET files returned " + length + " files"
+              for file in res
+                console.log "--- --- filename: " + file.filename
+
       else
         console.log "--- ignorable PR"
       
