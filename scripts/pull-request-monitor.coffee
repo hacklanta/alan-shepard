@@ -61,11 +61,23 @@ module.exports = (robot) ->
     msg.send json.head.repo.name
 
   robot.router.post '/pull-request-activity', (req, res) ->
-    console.log "pull-request-activity HIT"
+    console.log "---------------- POST for pull-request-activity RECEIVED"
 
     try
-      console.log req.body['number']
-      console.log req.body['pull_request']['head']['repo']['name']
+      number = req.body['pull_request']['number']
+      action = req.body['action']
+      
+      console.log  "---   number: " + number
+      console.log  "---   action: " + action
+      
+      if action == "opened" || "reopened" || "synchronized"
+        console.log "--- found PR to act upon"
+        console.log "---   need to GET file info"
+      else
+        console.log "--- ignorable PR"
+      
+      # 1 get POST from GH
+      # 2 check to see if it's 
 
       #console.log payload.number + " ============ number"
 
