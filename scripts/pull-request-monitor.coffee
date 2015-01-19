@@ -99,26 +99,23 @@ module.exports = (robot) ->
     }
   }
 
-  robot.respond /hi/i, (msg) ->
-    msg.send json.number
-    msg.send json.head.repo.name
-
   robot.router.post '/pull-request-activity', (req, res) ->
     console.log "---------------- POST for pull-request-activity RECEIVED"
 
     try
-      number = req.body['pull_request']['number']
-      action = req.body['action']
+      number = req.body.pull_request.number
+      action = req.body.action
+      repo = req.body.head.repo.name
       
       console.log  "---   number: " + number
       console.log  "---   action: " + action
 
-      if robot.brain.monitor
+      if robot.brain.monitorBook
         if action == "opened" || "reopened" || "synchronized"
           console.log "--- found PR to act upon"
           console.log "---   GETting file info"
           robot
-            .http("https://api.github.com/repos/elemica/mercury/pulls/" + number + "/files")
+            .http("https://api.github.com/repos/elemica/" + repo + "/pulls/" + number + "/files")
             .header('authorization', "token #{GITHUB_TOKEN}")
             .get() (err, res, body) ->
               if err
