@@ -4,8 +4,9 @@ GITHUB_TOKEN = process.env['GITHUB_TOKEN']
 
 module.exports = (robot) ->
 
-  robot.repond /monitor (dir|file) (.+)/i, (msg) ->
+  robot.respond /monitor (dir|file) (.+)/i, (msg) ->
     console.log "monitoring " + msg[1] + " " + msg[2]
+    # store information in reddis
 
   json = {
     "action": "opened",
