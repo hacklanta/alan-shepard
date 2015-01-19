@@ -4,9 +4,25 @@ GITHUB_TOKEN = process.env['GITHUB_TOKEN']
 
 module.exports = (robot) ->
 
-  robot.respond /monitor (dir|file) (.+)/i, (msg) ->
-    console.log "monitoring " + msg[1] + " " + msg[2]
-    # store information in reddis
+  monitorPath = (msg) ->
+    repo = msg.match[1].trim()
+    type = msg.match[2].trim()
+    if type == "file"
+      pathType = "files"
+    else
+      pathType = "dirs"
+    path = msg.match[3].trim()
+
+    monitorBook = robot.brain.get('monitorBook') || {}
+    monitorBook[repo] ||= {}
+    monitorBook[repo][pathType] ||= []
+    monitorBook[repo][pathType].push { path: "foo", human: "ari"}
+
+    msg.send "monitoring #{type} #{path} in #{repo}"
+    msg.send "full monitorBook: #{JSON.stringify(monitorBook)}"
+
+  robot.respond /monitor (.+) (dir|file) (.+)/i, (msg) ->
+    monitorPath(msg)
 
   json = {
     "action": "opened",
