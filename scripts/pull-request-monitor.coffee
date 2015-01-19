@@ -110,7 +110,7 @@ module.exports = (robot) ->
       console.log  "---   number: " + number
       console.log  "---   action: " + action
 
-      if robot.brain.monitorBook
+      if robot.brain.monitorBook && robot.brain.monitorBook[repo]
         if action == "opened" || "reopened" || "synchronized"
           console.log "--- found PR to act upon"
           console.log "---   GETting file info"
@@ -136,6 +136,8 @@ module.exports = (robot) ->
                       console.log("matched directory, sending notifications")
         else
           console.log "--- ignorable PR"
+      else
+        console.log "either no data stored or this repo ain't monitored"
       
       # it'd sure be nice to do ^^^ functionally
 
