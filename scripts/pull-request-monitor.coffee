@@ -12,16 +12,17 @@ module.exports = (robot) ->
     else
       pathType = "dirs"
     path = msg.match[3].trim()
+    humans = msg.match[4].trim()
 
     monitorBook = robot.brain.get('monitorBook') || {}
     monitorBook[repo] ||= {}
     monitorBook[repo][pathType] ||= []
-    monitorBook[repo][pathType].push { path: "foo", human: "ari"}
+    monitorBook[repo][pathType].push { path: "foo", humans: "ari"}
 
-    msg.send "monitoring #{type} #{path} in #{repo}"
+    msg.send "monitoring #{type} #{path} in #{repo} for #{humans}"
     msg.send "full monitorBook: #{JSON.stringify(monitorBook)}"
 
-  robot.respond /monitor (.+) (dir|file) (.+)/i, (msg) ->
+  robot.respond /monitor (\S+) (dir|file) (\S+) (.+$)/i, (msg) ->
     monitorPath(msg)
 
   json = {
