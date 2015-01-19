@@ -1,3 +1,20 @@
+# Description:
+#   Monitor files or directories in GitHub.
+#   Notified if a Pull Request is opened, reopened or synchronized
+#
+# Dependencies:
+#   Nope
+#
+# Configuration:
+#   Nope
+#
+# Commands:
+#   hubot monitor {repo} {"dir" or "file"} {path} {humans} - path - a directory or file, humans - who to notify
+# 
+# Author: 
+#   hacklanta
+
+
 Util = require 'util'
 
 GITHUB_TOKEN = process.env['GITHUB_TOKEN']
@@ -7,19 +24,21 @@ module.exports = (robot) ->
   monitorPath = (msg) ->
     repo = msg.match[1].trim()
     type = msg.match[2].trim()
-    if type == "file"
-      pathType = "files"
-    else
-      pathType = "dirs"
     path = msg.match[3].trim()
     humans = msg.match[4].trim()
 
+    if type == "file"
+      pathTo = "files"
+    else
+      pathTo = "dirs"
+
     monitorBook = robot.brain.get('monitorBook') || {}
     monitorBook[repo] ||= {}
-    monitorBook[repo][pathType] ||= []
-    monitorBook[repo][pathType].push { path: "foo", humans: "ari"}
+    monitorBook[repo][pathTo] ||= []
+    monitorBook[repo][pathTo].push { path: "foo", humans: "ari"}
 
     msg.send "monitoring #{type} #{path} in #{repo} for #{humans}"
+
     msg.send "full monitorBook: #{JSON.stringify(monitorBook)}"
 
   robot.respond /monitor (\S+) (dir|file) (\S+) (.+$)/i, (msg) ->
