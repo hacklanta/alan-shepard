@@ -35,11 +35,14 @@ module.exports = (robot) ->
     monitorBook = robot.brain.get('monitorBook') || {}
     monitorBook[repo] ||= {}
     monitorBook[repo][pathTo] ||= []
-    monitorBook[repo][pathTo].push { path: "foo", humans: "ari"}
 
+    # QQQ - improvement, see if path exists
+    monitorBook[repo][pathTo].push { path: path, humans: humans }
+      
     msg.send "monitoring #{type} #{path} in #{repo} for #{humans}"
-
     msg.send "full monitorBook: #{JSON.stringify(monitorBook)}"
+
+    robot.brain.set 'monitorBook', monitorBook
 
   robot.respond /monitor (\S+) (dir|file) (\S+) (.+$)/i, (msg) ->
     monitorPath(msg)
