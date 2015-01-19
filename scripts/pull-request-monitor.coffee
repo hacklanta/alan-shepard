@@ -4,6 +4,9 @@ GITHUB_TOKEN = process.env['GITHUB_TOKEN']
 
 module.exports = (robot) ->
 
+  robot.repond /monitor (dir|file) (.+)/i, (msg) ->
+    console.log "monitoring " + msg[1] + " " + msg[2]
+
   json = {
     "action": "opened",
     "number": 50,
@@ -69,33 +72,35 @@ module.exports = (robot) ->
       
       console.log  "---   number: " + number
       console.log  "---   action: " + action
+
+      if robot.brain.monitor
+        if action == "opened" || "reopened" || "synchronized"
+          console.log "--- found PR to act upon"
+          console.log "---   GETting file info"
+          robot
+            .http("https://api.github.com/repos/elemica/mercury/pulls/" + number + "/files")
+            .header('authorization', "token #{GITHUB_TOKEN}")
+            .get() (err, res, body) ->
+              if err
+                robot.send "Encountered and error :( ${err}"
+              else
+                files = JSON.parse(body)
+                length = files.length
+                console.log "--- GET files returned " + length + " files"
+                for file in files
+                  console.log "--- --- filename: " + file.filename
+                  monitoredFiles = robot.brain.monitor[repo].files
+                  monitoredDirectories = robot.brain.monitor[repo].directories
+                  for monitoredFile in monitoredFiles
+                    if file.fileame.match ( monitoredFile.pattern )
+                      console.log("matched file, sending notifications")
+                  for monitoredDirectory in monitoredDirectories
+                    if file.filename.match ( monitoredDiretory )
+                      console.log("matched directory, sending notifications")
+        else
+          console.log "--- ignorable PR"
       
-      if action == "opened" || "reopened" || "synchronized"
-        console.log "--- found PR to act upon"
-        console.log "---   need to GET file info"
-        robot
-          .http("https://api.github.com/repos/elemica/mercury/pulls/" + number + "/files")
-          .header('authorization', "token #{GITHUB_TOKEN}")
-          .get() (err, res, body) ->
-            if err
-              robot.send "Encountered and error :( ${err}"
-            else
-              files = JSON.parse(body)
-              length = files.length
-              console.log "--- GET files returned " + length + " files"
-              for file in files
-                console.log "--- --- filename: " + file.filename
-
-      else
-        console.log "--- ignorable PR"
-      
-      # 1 get POST from GH
-      # 2 check to see if it's 
-
-      #console.log payload.number + " ============ number"
-
-      #payload = JSON.parse req.param('payload')
-      #console.log ">>>>>>>>> payload: " + Util.inspect(payload)
+      # it'd sure be nice to do ^^^ functionally
 
       #robot
       #.http("https://api.github.com/repos/elemica/mercury/pulls/3652/files")
