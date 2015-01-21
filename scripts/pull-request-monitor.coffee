@@ -1,15 +1,15 @@
 # Description:
-#   Monitor files or directories in GitHub.
-#   Notified if a Pull Request is opened, reopened or synchronized
+#   This monitors if a Pull Request is opened, reopened or synchronized and
+#   notified the user if any files referenced by the PR match the given path.
 #
 # Dependencies:
-#   Nope
+#   QQQ hmm...
 #
 # Configuration:
-#   Nope
+#   QQQ hmm...
 #
 # Commands:
-#   hubot monitor {repo} {"dir" or "file"} {path} {humans} - path - a directory or file, humans - who to notify
+#   hubot monitor {repo} {path} - path is a regex (the script prepends a "/")
 # 
 # Author: 
 #   hacklanta
@@ -23,49 +23,23 @@ module.exports = (robot) ->
 
   monitorPath = (msg) ->
     repo = msg.match[1].trim()
-    type = msg.match[2].trim()
-    path = msg.match[3].trim()
-    humans = msg.match[4].trim()
-
-    if type == "file"
-      pathTo = "files"
-    else
-      pathTo = "dirs"
+    # QQQ - need to check that path doesn't already start with a '/'
+    path = '/' + msg.match[2].trim()
 
     monitorBook = robot.brain.get('monitorBook') || {}
-    monitorBook[repo] ||= {}
-    monitorBook[repo][pathTo] ||= []
+    monitorBook[repo] ||= []
 
-    # QQQ - improvement, see if path exists
-    monitorBook[repo][pathTo].push { path: path, humans: humans }
+    # QQQ - improvement, see if path exists in the brain
+    monitorBook[repo].push { path: path, user: msg.message.user }
       
-    msg.send "monitoring #{type} #{path} in #{repo} for #{humans}"
+    msg.send "monitoring #{path} in #{repo}"
     msg.send "full monitorBook: #{JSON.stringify(monitorBook)}"
 
     robot.brain.set 'monitorBook', monitorBook
 
-  robot.respond /monitor (\S+) (dir|file) (\S+) (.+$)/i, (msg) ->
+  robot.respond /monitor (\S+) (\S+$)/i, (msg) ->
+    console.log "   >>> msg.message.user: " + Util.inspect(msg.message.user)
     monitorPath(msg)
-
-  json = {
-    "action": "opened",
-    "number": 3298,
-    "pull_request": {
-      "url": "https://api.github.com/repos/elemica/mercury/pulls/3298",
-      "id": 22532849,
-      "number": 3298,
-      "state": "open",
-      "locked": false,
-      "title": "Expanded Dashboard Rows"
-    },
-    "head": {
-      "repo": {
-        "id": 20000106,
-        "name": "mercury",
-        "full_name": "elemica/mercury"
-      }
-    }
-  }
 
   robot.router.post '/pull-request-activity', (req, res) ->
     console.log "---------------- POST for pull-request-activity RECEIVED"
@@ -95,15 +69,13 @@ module.exports = (robot) ->
                 length = files.length
                 console.log "--- GET files returned " + length + " files"
                 for file in files
-                  console.log "--- filename: " + file.filename
-                  monitoredFiles = monitorBook[repo].files
-                  # monitoredDirectories = monitorBook[repo].dirs
-                  for monitoredFile in monitoredFiles
-                    if file.filename.match ( monitoredFile.path )
-                      console.log("matched file, sending notifications")
-                  # for monitoredDirectory in monitoredDirectories
-                  #   if file.filename.match ( monitoredDiretory )
-                  #     console.log("matched directory, sending notifications")
+                  paths = monitorBook[repo]
+                  for path in paths
+                    if file.filename.match ( path.path )
+                      envelope = user: path.user, room: path.user.room
+                      message = "PR " + number + " matched \"" + path.path + "\" with \"" +
+                        file.filename + "\" in " + repo
+                      robot.send envelope, message
         else
           console.log "--- ignorable PR"
       else
