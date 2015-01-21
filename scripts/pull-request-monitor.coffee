@@ -46,6 +46,7 @@ module.exports = (robot) ->
     try
       number = req.body.pull_request.number
       action = req.body.action
+      console.log "     --------- req.body: " + Util.inspect(req.body)
       repo = req.body.head.repo.name
       
       console.log  "---   number: " + number
