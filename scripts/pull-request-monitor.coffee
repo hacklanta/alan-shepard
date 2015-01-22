@@ -77,23 +77,15 @@ module.exports = (robot) ->
 #
 #
   robot.router.post '/pull-request-activity', (req, res) ->
-    console.log "---------------- POST for pull-request-activity RECEIVED"
     try
       number = req.body.pull_request.number
       action = req.body.action
-      console.log "     --------- req.body: " + Util.inspect(req.body)
       repo = req.body.repository.name
       
-      console.log  "---   number: " + number
-      console.log  "---   action: " + action
-      console.log  "---     repo: " + repo
-
       steward = robot.brain.get('steward')
 
       if steward && steward[repo]
         if action in ["opened", "reopened", "closed"]
-          console.log "--- found PR to act upon"
-          console.log "---   GETting file info"
           robot
             .http("https://api.github.com/repos/elemica/" + repo + "/pulls/" + number + "/files")
             .header('authorization', "token #{GITHUB_TOKEN}")
@@ -103,7 +95,6 @@ module.exports = (robot) ->
               else
                 files = JSON.parse(body)
                 length = files.length
-                console.log "--- GET files returned " + length + " files"
                 for file in files
                   affairs = steward[repo]
                   for affair in affairs
@@ -112,11 +103,6 @@ module.exports = (robot) ->
                       message = "@#{affair.user.name} PR #{number} matched #{affair.path} with" +
                         " #{file.filename} in #{repo}. The PR was #{action}."
                       robot.send envelope, message
-        else
-          console.log "--- ignorable PR"
-      else
-        console.log "either no data stored or this repo ain't monitored"
-        console.log "redis: " + JSON.stringify(robot.brain.get('steward'))
 
     catch exception
       console.log "It's all gone wrong:", exception, exception.stack
