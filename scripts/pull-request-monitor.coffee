@@ -106,9 +106,9 @@ module.exports = (robot) ->
                 files = JSON.parse(body)
                 length = files.length
                 console.log "--- GET files returned " + length + " files"
-                paths = monitorBook[repo]
-                for path in paths
-                  for file in files
+                for file in files
+                  paths = monitorBook[repo]
+                  for path in paths
                     if file.filename.match ( path.path )
                       envelope = user: path.user, room: path.user.room
                       message = "PR #{number} matched #{path.path} with #{file.filename} in #{repo}."
