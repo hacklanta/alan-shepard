@@ -27,17 +27,15 @@ module.exports = (robot) ->
 #
 #
   robot.respond /monitor (\S+) for (\S+$)/i, (msg) ->
-    monitorPath(msg)
+    getAffairInOrder(msg)
 
-  monitorPath = (msg) ->
+  getAffairInOrder = (msg) ->
     repo = msg.match[1].trim()
-    # QQQ - need to check that path doesn't already start with a '/'
     path = '/' + msg.match[2].trim()
 
     steward = robot.brain.get('steward') || {}
     steward[repo] ||= []
 
-    # QQQ - improvement, see if path exists in the brain
     steward[repo].push { path: path, user: msg.message.user }
       
     msg.send "Okay. I'm monitoring #{path} in #{repo}."
@@ -76,6 +74,10 @@ module.exports = (robot) ->
     steward = robot.brain.get('steward') || {}
     msg.send "steward: #{JSON.stringify(steward)}"
 
+#
+#
+  robot.respond /fulldestruction/, (msg) ->
+    robot.brain.remove('monitorBook')
 #
 #
   robot.router.post '/pull-request-activity', (req, res) ->
