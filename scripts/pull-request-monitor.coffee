@@ -15,10 +15,8 @@
 #   hubot show steward - for everyone
 # 
 # Author: 
-#   hacklanta
-
-
-Util = require 'util'
+#   riveramj
+#   arigoldx
 
 GITHUB_TOKEN = process.env['GITHUB_TOKEN']
 
@@ -84,7 +82,6 @@ module.exports = (robot) ->
                 robot.send "Encountered an error monitoring PR#{number} :( ${err}"
               else
                 files = JSON.parse(body)
-                length = files.length
                 for file in files
                   affairs = steward[repo]
                   for affair in affairs
