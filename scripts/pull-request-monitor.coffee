@@ -12,7 +12,7 @@
 #   hubot monitor {repo} for {path} - path is a regex (the script prepends a "/")
 #   hubot stop all monitoring period - for everyone, so know what you're doing
 #   hubot stop monitoring {path} in {repo}
-#   hubot show monitorBook - for everyone
+#   hubot show steward - for everyone
 # 
 # Author: 
 #   hacklanta
@@ -34,15 +34,15 @@ module.exports = (robot) ->
     # QQQ - need to check that path doesn't already start with a '/'
     path = '/' + msg.match[2].trim()
 
-    monitorBook = robot.brain.get('monitorBook') || {}
-    monitorBook[repo] ||= []
+    steward = robot.brain.get('steward') || {}
+    steward[repo] ||= []
 
     # QQQ - improvement, see if path exists in the brain
-    monitorBook[repo].push { path: path, user: msg.message.user }
+    steward[repo].push { path: path, user: msg.message.user }
       
     msg.send "Okay. I'm monitoring #{path} in #{repo}."
 
-    robot.brain.set 'monitorBook', monitorBook
+    robot.brain.set 'steward', steward
 
 #
 #
@@ -54,27 +54,27 @@ module.exports = (robot) ->
     path = '/' + msg.match[1].trim()
     repo = msg.match[2].trim()
 
-    monitorBook = robot.brain.get('monitorBook') || {}
+    steward = robot.brain.get('steward') || {}
     
-    monitorBook[repo] = monitorBook[repo].filter (monitoredPath) ->
+    steward[repo] = steward[repo].filter (monitoredPath) ->
       (monitoredPath.path != path) && (monitoredPath.user != user)
 
-    robot.brain.set 'monitorBook', monitorBook
+    robot.brain.set 'steward', steward
 
     msg.send "Okay. I'm no longer montioring for #{path} in #{repo} for you."
 
 #
 #
   robot.respond /stop all monitoring period/i, (msg) ->
-    robot.brain.set 'monitorBook', {}
+    robot.brain.set 'steward', {}
 
     msg.send "Monitor what? There's nothing to monitor. ;-)"
 
 #
 #
-  robot.respond /show monitorBook/i, (msg) ->
-    monitorBook = robot.brain.get('monitorBook') || {}
-    msg.send "monitorBook: #{JSON.stringify(monitorBook)}"
+  robot.respond /show steward/i, (msg) ->
+    steward = robot.brain.get('steward') || {}
+    msg.send "steward: #{JSON.stringify(steward)}"
 
 #
 #
@@ -90,10 +90,10 @@ module.exports = (robot) ->
       console.log  "---   action: " + action
       console.log  "---     repo: " + repo
 
-      monitorBook = robot.brain.get('monitorBook')
+      steward = robot.brain.get('steward')
 
-      if monitorBook && monitorBook[repo]
-        if action == "opened" || "reopened" || "closed"
+      if steward && steward[repo]
+        if action in ["opened", "reopened", "closed"]
           console.log "--- found PR to act upon"
           console.log "---   GETting file info"
           robot
@@ -107,7 +107,7 @@ module.exports = (robot) ->
                 length = files.length
                 console.log "--- GET files returned " + length + " files"
                 for file in files
-                  paths = monitorBook[repo]
+                  paths = steward[repo]
                   for path in paths
                     if file.filename.match ( path.path )
                       envelope = user: path.user, room: path.user.room
@@ -118,7 +118,7 @@ module.exports = (robot) ->
           console.log "--- ignorable PR"
       else
         console.log "either no data stored or this repo ain't monitored"
-        console.log "redis: " + JSON.stringify(robot.brain.get('monitorBook'))
+        console.log "redis: " + JSON.stringify(robot.brain.get('steward'))
 
     catch exception
       console.log "It's all gone wrong:", exception, exception.stack
