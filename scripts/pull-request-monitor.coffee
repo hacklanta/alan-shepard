@@ -1,5 +1,5 @@
 # Description:
-#   This monitors if a Pull Request is opened, reopened or synchronized and
+#   This monitors if a Pull Request is opened, reopened or closed and
 #   notified the user if any files referenced by the PR match the given path.
 #
 # Dependencies:
@@ -45,9 +45,9 @@ module.exports = (robot) ->
 #
 #
   robot.respond /stop monitoring (\S+) in (\S+$)/i, (msg) ->
-    stopSomeMonitoring(msg)
+    stopStewardingAffair(msg)
 
-  stopSomeMonitoring = (msg) ->
+  stopStewardingAffair = (msg) ->
     user = msg.message.user
     path = '/' + msg.match[1].trim()
     repo = msg.match[2].trim()
