@@ -111,7 +111,7 @@ module.exports = (robot) ->
                   for path in paths
                     if file.filename.match ( path.path )
                       envelope = user: path.user, room: path.user.room
-                      message = "PR #{number} matched #{path.path} with #{file.filename} in #{repo}."
+                      message = "@#{path.user} PR #{number} matched #{path.path} with #{file.filename} in #{repo}."
                       robot.send envelope, message
         else
           console.log "--- ignorable PR"
