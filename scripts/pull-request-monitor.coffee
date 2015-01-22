@@ -3,10 +3,10 @@
 #   notified the user if any files referenced by the PR match the given path.
 #
 # Dependencies:
-#   QQQ hmm...
+#   none
 #
 # Configuration:
-#   QQQ hmm...
+#   GITHUB_TOKEN - sent in Http GET header
 #
 # Commands:
 #   hubot monitor {repo} for {path} - path is a regex (the script prepends a "/")
@@ -106,4 +106,3 @@ module.exports = (robot) ->
 
     catch exception
       console.log "It's all gone wrong:", exception, exception.stack
-      res.send 500, "It's all gone wrong: #{Util.inspect exception}"
