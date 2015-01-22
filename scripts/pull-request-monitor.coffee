@@ -101,17 +101,17 @@ module.exports = (robot) ->
             .header('authorization', "token #{GITHUB_TOKEN}")
             .get() (err, res, body) ->
               if err
-                robot.send "Encountered and error :( ${err}"
+                robot.send "Encountered an error monitoring PR#{number} :( ${err}"
               else
                 files = JSON.parse(body)
                 length = files.length
                 console.log "--- GET files returned " + length + " files"
                 for file in files
-                  paths = steward[repo]
-                  for path in paths
-                    if file.filename.match ( path.path )
-                      envelope = user: path.user, room: path.user.room
-                      message = "@#{path.user.name} PR #{number} matched #{path.path} with" +
+                  affairs = steward[repo]
+                  for affair in affairs
+                    if file.filename.match ( affair.path )
+                      envelope = user: affair.user, room: affair.user.room
+                      message = "@#{affair.user.name} PR #{number} matched #{affair.path} with" +
                         " #{file.filename} in #{repo}. The PR was #{action}."
                       robot.send envelope, message
         else
