@@ -24,8 +24,6 @@ GITHUB_TOKEN = process.env['GITHUB_TOKEN']
 
 module.exports = (robot) ->
 
-#
-#
   robot.respond /monitor (\S+) for (\S+$)/i, (msg) ->
     getAffairInOrder(msg)
 
@@ -42,8 +40,6 @@ module.exports = (robot) ->
 
     robot.brain.set 'steward', steward
 
-#
-#
   robot.respond /stop monitoring (\S+) in (\S+$)/i, (msg) ->
     stopStewardingAffair(msg)
 
@@ -61,21 +57,15 @@ module.exports = (robot) ->
 
     msg.send "Okay. I'm no longer montioring for #{path} in #{repo} for you."
 
-#
-#
   robot.respond /stop all monitoring period/i, (msg) ->
     robot.brain.set 'steward', {}
 
     msg.send "Monitor what? There's nothing to monitor. ;-)"
 
-#
-#
   robot.respond /show steward/i, (msg) ->
     steward = robot.brain.get('steward') || {}
     msg.send "steward: #{JSON.stringify(steward)}"
 
-#
-#
   robot.router.post '/pull-request-activity', (req, res) ->
     try
       number = req.body.pull_request.number
