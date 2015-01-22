@@ -93,7 +93,7 @@ module.exports = (robot) ->
       monitorBook = robot.brain.get('monitorBook')
 
       if monitorBook && monitorBook[repo]
-        if action == "opened" || "reopened" || "synchronized"
+        if action == "opened" || "reopened" || "closed"
           console.log "--- found PR to act upon"
           console.log "---   GETting file info"
           robot
@@ -111,7 +111,8 @@ module.exports = (robot) ->
                   for path in paths
                     if file.filename.match ( path.path )
                       envelope = user: path.user, room: path.user.room
-                      message = "@#{path.user.name} PR #{number} matched #{path.path} with #{file.filename} in #{repo}."
+                      message = "@#{path.user.name} PR #{number} matched #{path.path} with" +
+                        " #{file.filename} in #{repo}. The PR was #{action}."
                       robot.send envelope, message
         else
           console.log "--- ignorable PR"
