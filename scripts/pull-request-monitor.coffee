@@ -76,15 +76,6 @@ module.exports = (robot) ->
 
 #
 #
-  robot.respond /fulldestruction/, (msg) ->
-    monitor = robot.brain.get('monitorBook')
-    msg.send " before everything, monitorBook: #{JSON.stringify(monitor)}"
-    robot.brain.remove('monitorBook')
-    monitor = robot.brain.get('monitorBook') || "nothing to get.. it's dead"
-    msg.send "  after everything, monitorBook: #{JSON.stringify(monitor)}"
-
-#
-#
   robot.router.post '/pull-request-activity', (req, res) ->
     console.log "---------------- POST for pull-request-activity RECEIVED"
     try
