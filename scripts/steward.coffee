@@ -67,6 +67,8 @@ module.exports = (robot) ->
     msg.send "steward: #{JSON.stringify(steward)}"
 
   robot.router.post '/steward/pull-request', (req, res) ->
+    console.log "                ---------------------------------------------------" 
+    console.log "       req.body: " + JSON.stringify(req.body)
     console.log "      /steward/pull-request endpoint HIT"
     try
       number = req.body.pull_request.number
