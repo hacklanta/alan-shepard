@@ -12,7 +12,7 @@
 #   hubot monitor {repo} for {path} - path is a regex (the script prepends a "/")
 #   hubot stop all monitoring period - for everyone, so know what you're doing
 #   hubot stop monitoring {path} in {repo}
-#   hubot show steward - for everyone
+#   hubot show affairs - for everyone
 # 
 # Author: 
 #   riveramj
@@ -60,7 +60,7 @@ module.exports = (robot) ->
 
     msg.send "Monitor what? There's nothing to monitor. ;-)"
 
-  robot.respond /show steward/i, (msg) ->
+  robot.respond /show affairs/i, (msg) ->
     steward = robot.brain.get('steward') || {}
     msg.send "steward: #{JSON.stringify(steward)}"
 
