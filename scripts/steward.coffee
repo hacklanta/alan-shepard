@@ -64,7 +64,7 @@ module.exports = (robot) ->
     steward = robot.brain.get('steward') || {}
     msg.send "steward: #{JSON.stringify(steward)}"
 
-  robot.router.post '/pull-request-activity', (req, res) ->
+  robot.router.post '/steward/pull-request', (req, res) ->
     try
       number = req.body.pull_request.number
       action = req.body.action
