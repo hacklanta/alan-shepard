@@ -7,6 +7,7 @@
 #
 # Configuration:
 #   GITHUB_TOKEN - sent in Http GET header
+#   STEWARD_ORGANIZATION - your GitHub organization or username
 #
 # Commands:
 #   hubot monitor {repo} for {path} - path is a regex (the script prepends a "/")
@@ -66,11 +67,18 @@ module.exports = (robot) ->
     msg.send "steward: #{JSON.stringify(steward)}"
 
   robot.router.post '/steward/pull-request', (req, res) ->
+    console.log "      /steward/pull-request endpoint HIT"
     try
       number = req.body.pull_request.number
       action = req.body.action
       repo = req.body.repository.name
       
+      console.log "number = " + number
+      console.log "action = " + action
+      console.log "  repo = " + repo
+
+      console.log "ORG    = " + ORGANIZATION
+
       steward = robot.brain.get('steward')
 
       if steward && steward[repo]
