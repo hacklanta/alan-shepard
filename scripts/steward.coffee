@@ -67,26 +67,12 @@ module.exports = (robot) ->
     msg.send "steward: #{JSON.stringify(steward)}"
 
   robot.router.post '/steward/pull-request', (req, res) ->
-    console.log "                ---------------------------------------------------" 
-    console.log "                ---------------------------------------------------" 
-
-    console.log "       req.body: " + JSON.parse req.body.payload
-    
-    console.log "                ---------------------------------------------------" 
-    console.log "                ---------------------------------------------------" 
-    console.log "      /steward/pull-request endpoint HIT"
     try
       payload = JSON.parse req.param('payload')
       action = payload.action
       number = payload.pull_request.number
       repo = payload.repository.name
       
-      console.log "number = " + number
-      console.log "action = " + action
-      console.log "  repo = " + repo
-
-      console.log "ORG    = " + ORGANIZATION
-
       steward = robot.brain.get('steward')
 
       if steward && steward[repo]
