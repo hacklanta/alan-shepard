@@ -19,6 +19,7 @@
 #   arigoldx
 
 GITHUB_TOKEN = process.env['GITHUB_TOKEN']
+ORGANIZATION = process.env['STEWARD_ORGANIZATION']
 
 module.exports = (robot) ->
 
@@ -75,7 +76,7 @@ module.exports = (robot) ->
       if steward && steward[repo]
         if action in ["opened", "reopened", "closed"]
           robot
-            .http("https://api.github.com/repos/elemica/" + repo + "/pulls/" + number + "/files")
+            .http("https://api.github.com/repos/" + ORGANIZATION + "/" + repo + "/pulls/" + number + "/files")
             .header('authorization', "token #{GITHUB_TOKEN}")
             .get() (err, res, body) ->
               if err
