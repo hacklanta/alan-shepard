@@ -68,18 +68,18 @@ module.exports = (robot) ->
 
   robot.router.post '/steward/pull-request', (req, res) ->
     console.log "                ---------------------------------------------------" 
-    console.log "       req.body.payload.number: " + req.body.payload.number
     console.log "                ---------------------------------------------------" 
 
-    console.log "       req.body: " + JSON.stringify(req.body.payload, null, 4)
+    console.log "       req.body: " + JSON.parse req.body.payload
     
     console.log "                ---------------------------------------------------" 
     console.log "                ---------------------------------------------------" 
     console.log "      /steward/pull-request endpoint HIT"
     try
-      action = req.body.payload.action
-      number = req.body.payload.pull_request.number
-      repo = req.body.payload.repository.name
+      payload = JSON.parse req.param('payload')
+      action = payload.action
+      number = payload.pull_request.number
+      repo = payload.repository.name
       
       console.log "number = " + number
       console.log "action = " + action
