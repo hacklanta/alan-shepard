@@ -71,9 +71,9 @@ module.exports = (robot) ->
     console.log "       req.body: " + JSON.stringify(req.body, null, 4)
     console.log "      /steward/pull-request endpoint HIT"
     try
-      number = req.body.pull_request.number
-      action = req.body.action
-      repo = req.body.repository.name
+      number = req.body.payload.pull_request.number
+      action = req.body.payload.action
+      repo = req.body.payload.repository.name
       
       console.log "number = " + number
       console.log "action = " + action
