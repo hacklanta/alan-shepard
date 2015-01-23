@@ -71,7 +71,7 @@ module.exports = (robot) ->
     console.log "       req.body.payload.number: " + req.body.payload.number
     console.log "                ---------------------------------------------------" 
 
-    console.log "       req.body: " + JSON.stringify(req.body, null, 4)
+    console.log "       req.body: " + JSON.stringify(req.body.payload, null, 4)
     
     console.log "                ---------------------------------------------------" 
     console.log "                ---------------------------------------------------" 
