@@ -132,7 +132,7 @@ addLinksToComment = (commentUrl, commentId, commentBody) -> (robot, pullRequestI
   # put to Github the updated body
   robot
     .http(commentUrl)
-    .header('authorization', "token #{GITHUB_TOKEN}")
+    .header('Authorization', "token #{GITHUB_TOKEN}")
     .header('Accept', 'application/json')
     .patch(JSON.stringify(
       body: updatedBody

@@ -79,7 +79,7 @@ module.exports = (robot) ->
         if action in ["opened", "reopened", "closed"]
           robot
             .http("https://api.github.com/repos/" + ORGANIZATION + "/" + repo + "/pulls/" + number + "/files")
-            .header('authorization', "token #{GITHUB_TOKEN}")
+            .header('Authorization', "token #{GITHUB_TOKEN}")
             .get() (err, res, body) ->
               if err
                 robot.send "Encountered an error monitoring PR#{number} :( ${err}"
