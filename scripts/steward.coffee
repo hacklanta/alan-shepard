@@ -28,15 +28,15 @@ module.exports = (robot) ->
     getAffairInOrder(msg)
 
   getAffairInOrder = (msg) ->
-    repo = msg.match[1].trim()
-    path = '/' + msg.match[2].trim()
+    repo = msg.match[2].trim()
+    path = msg.match[3].trim()
 
     steward = robot.brain.get('steward') || {}
     steward[repo] ||= []
 
     steward[repo].push { path: path, user: msg.message.user }
       
-    msg.send "Okay. I'm monitoring #{path} in #{repo}."
+    msg.send "Okay. I'm monitoring #{repo} for #{path}."
 
     robot.brain.set 'steward', steward
 
@@ -45,8 +45,8 @@ module.exports = (robot) ->
 
   stopStewardingAffair = (msg) ->
     user = msg.message.user
-    repo = msg.match[1].trim()
-    path = '/' + msg.match[2].trim()
+    repo = msg.match[2].trim()
+    path = msg.match[3].trim()
 
     steward = robot.brain.get('steward') || {}
     
@@ -55,7 +55,7 @@ module.exports = (robot) ->
 
     robot.brain.set 'steward', steward
 
-    msg.send "Okay. I'm no longer montioring for #{path} in #{repo} for you."
+    msg.send "Okay. I'm no longer montioring #{repo} for #{path}."
 
   robot.respond /stop all monitoring period/i, (msg) ->
     robot.brain.set 'steward', {}
