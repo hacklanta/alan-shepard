@@ -10,9 +10,9 @@
 #   STEWARD_ORGANIZATION - your GitHub organization or username
 #
 # Commands:
-#   hubot monitor {repo} for {path} - path is a regex (the script prepends a "/")
+#   hubot (monitor|monitoring) {repo} for {path} - path is a regex (the script prepends a "/")
 #   hubot stop all monitoring period - for everyone, so know what you're doing
-#   hubot stop monitoring {path} in {repo}
+#   hubot stop (monitor|monitoring) {repo} for {path}
 #   hubot show affairs - for everyone
 # 
 # Author: 
@@ -24,7 +24,7 @@ ORGANIZATION = process.env['STEWARD_ORGANIZATION']
 
 module.exports = (robot) ->
 
-  robot.respond /monitor (\S+) for (\S+$)/i, (msg) ->
+  robot.respond /(monitor|monitoring) (\S+) for (\S+$)/i, (msg) ->
     getAffairInOrder(msg)
 
   getAffairInOrder = (msg) ->
@@ -40,13 +40,13 @@ module.exports = (robot) ->
 
     robot.brain.set 'steward', steward
 
-  robot.respond /stop monitoring (\S+) in (\S+$)/i, (msg) ->
+  robot.respond /stop (monitor|monitoring) (\S+) for (\S+$)/i, (msg) ->
     stopStewardingAffair(msg)
 
   stopStewardingAffair = (msg) ->
     user = msg.message.user
-    path = '/' + msg.match[1].trim()
-    repo = msg.match[2].trim()
+    repo = msg.match[1].trim()
+    path = '/' + msg.match[2].trim()
 
     steward = robot.brain.get('steward') || {}
     
