@@ -19,6 +19,8 @@
 #   riveramj
 #   arigoldx
 
+Util = require 'util'
+
 GITHUB_TOKEN = process.env['GITHUB_TOKEN']
 ORGANIZATION = process.env['STEWARD_ORGANIZATION']
 
@@ -94,5 +96,10 @@ module.exports = (robot) ->
                         " #{file.filename} in #{repo}. The PR was #{action}."
                       robot.send envelope, message
 
+        else
+
+      res.send 200, "Received POST for pull request #{number}"
+
     catch exception
       console.log "It's all gone wrong:", exception, exception.stack
+      res.send 500, "It's all gone wrong: #{Util.inspect exception}"
