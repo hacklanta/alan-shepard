@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "flip": "~0.1.0",
+    "githubot": "0.5.0",
     "hubot": "^2.11.4",
     "hubot-flowdock": ">=0.5.0",
     "hubot-gif-locker": "*",
