@@ -32,7 +32,8 @@
     "ntwitter": "0.5.0",
     "underscore": "1.6.0",
     "underscore.string": "2.3.3",
-    "hubot-tell": "*"
+    "hubot-tell": "*",
+    "hubot-shipit": "*"
   },
   "engines": {
     "node": ">= 0.8.x",
