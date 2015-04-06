@@ -31,7 +31,8 @@
     "jsdom": "0.10.1",
     "ntwitter": "0.5.0",
     "underscore": "1.6.0",
-    "underscore.string": "2.3.3"
+    "underscore.string": "2.3.3",
+    "hubot-tell": "*"
   },
   "engines": {
     "node": ">= 0.8.x",
