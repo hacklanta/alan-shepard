@@ -29,8 +29,7 @@ module.exports = (robot) ->
 
   processLogResults = (stdout, msg) ->
     if stdout
-      batchedLogs = stdout.match(/(\n|.){1,8000}/g)
-      sendLogs(batchedLogs, msg)
+      msg.send(stdout)
     else
       msg.send "Did not find any results"
 
