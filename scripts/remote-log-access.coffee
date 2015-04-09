@@ -47,7 +47,7 @@ module.exports = (robot) ->
       processLogResults(stdout, msg)
 
 
-  robot.respond /grep (.*) from (dev|router-dev|router-stg|stg) (portal|rica|scribe|fabric)/i, (msg) ->
+  robot.respond /grep "(.*)" from (dev|router-dev|router-stg|stg) (portal|rica|scribe|fabric)/i, (msg) ->
     searchValue = msg.match[1]
     env = msg.match[2]
     server = msg.match[3]
