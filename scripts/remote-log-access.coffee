@@ -56,5 +56,5 @@ module.exports = (robot) ->
  
     exec = require('child_process').exec
 
-    exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C grep -V #{searchValue} -E #{env} -S #{server}", (err, stdout, stderr) ->
+    exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C grep -V '#{searchValue}' -E #{env} -S #{server}", (err, stdout, stderr) ->
       processLogResults(stdout, msg)
