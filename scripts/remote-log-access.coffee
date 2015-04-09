@@ -28,8 +28,11 @@ module.exports = (robot) ->
   date = new Date().toISOString().replace(/T.*/, '').replace(/-/g,'_')
 
   processLogResults = (stdout, msg) ->
-    batchedLogs = stdout.match(/(\n|.){1,8000}/g)
-    sendLogs(batchedLogs, msg)
+    if stdout
+      batchedLogs = stdout.match(/(\n|.){1,8000}/g)
+      sendLogs(batchedLogs, msg)
+    else
+      msg.send "Did not find any results"
 
   robot.respond /tail ([0-9]*) from (dev|router-dev|router-stg|stg) (portal|rica|scribe|fabric)/i, (msg) ->
     tailAmount = msg.match[1]
