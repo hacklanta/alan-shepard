@@ -20,6 +20,7 @@ module.exports = (robot) ->
   sendLogs = (remainingLogs, msg) ->
       [toSend, rest...] = remainingLogs
       doSend = ->
+        console.log rest + " ========="
         msg.send(toSend)
         if (rest.length)
           sendLogs(rest)
@@ -29,7 +30,8 @@ module.exports = (robot) ->
 
   processLogResults = (stdout, msg) ->
     if stdout
-      msg.send(stdout)
+      batchedLogs = stdout.match(/(\n|.){1,8000}/g)
+      sendLogs(batchedLogs, msg)
     else
       msg.send "Did not find any results"
 
