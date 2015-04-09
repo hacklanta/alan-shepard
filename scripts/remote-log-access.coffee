@@ -27,13 +27,6 @@ module.exports = (robot) ->
 
   date = new Date().toISOString().replace(/T.*/, '').replace(/-/g,'_')
 
-  processLogResults = (stdout, msg) ->
-    echo "got stdout ==================="
-    echo stdout
-    batchedLogs = stdout.match(/(\n|.){1,8000}/g)
-
-    sendLogs(batchedLogs, msg)
-
   robot.respond /tail ([0-9]*) from (dev|router-dev|router-stg|stg) (portal|rica|scribe|fabric)/i, (msg) ->
     tailAmount = msg.match[1]
     env = msg.match[2]
@@ -44,8 +37,9 @@ module.exports = (robot) ->
     exec = require('child_process').exec
 
     exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C tail -N #{tailAmount} -E #{env} -S #{server}", (err, stdout, stderr)->
-      echo stdout
-      processLogResults(stdout)
+      batchedLogs = stdout.match(/(\n|.){1,8000}/g)
+
+      sendLogs(batchedLogs, msg)
 
       
 
@@ -59,5 +53,7 @@ module.exports = (robot) ->
     exec = require('child_process').exec
 
     exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C grep -V #{searchValue} -E #{env} -S #{server}", (err, stdout, stderr) ->
-      echo stdout
-      processLogResults(stdout)
+      batchedLogs = stdout.match(/(\n|.){1,8000}/g)
+
+      sendLogs(batchedLogs, msg)
+
