@@ -8,7 +8,7 @@
 #   Server shell script
 #
 # Commands:
-#   hubot tail {number of lines} from {env: dev|stg|router} {portal|scribe|fabric|rica} - runs tail command on log from the server and env given
+#   hubot tail {number of lines} from {dev|stg|router-dev|router-stg} {portal|scribe|fabric|rica} - runs tail command on log from the server and env given
 # 
 # Author: 
 #   @riveramj Mike Rivera
@@ -26,7 +26,7 @@ module.exports = (robot) ->
 
   date = new Date().toISOString().replace(/T.*/, '').replace(/-/g,'_')
 
-  robot.respond /tail ([0-9]*) from (dev|router|stg) (portal|rica|scribe|fabric)/i, (msg) ->
+  robot.respond /tail ([0-9]*) from (dev|router-dev|router-stg|stg) (portal|rica|scribe|fabric)/i, (msg) ->
     tailAmount = msg.match[1]
     env = msg.match[2]
     server = msg.match[3]
