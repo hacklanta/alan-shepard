@@ -23,7 +23,7 @@ module.exports = (robot) ->
         console.log rest + " ========="
         msg.send(toSend)
         if (rest.length)
-          sendLogs(rest)
+          sendLogs(rest, msg)
       setTimeout doSend, 500
 
   date = new Date().toISOString().replace(/T.*/, '').replace(/-/g,'_')
