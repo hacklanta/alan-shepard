@@ -20,7 +20,6 @@ module.exports = (robot) ->
   sendLogs = (remainingLogs, msg) ->
       [toSend, rest...] = remainingLogs
       doSend = ->
-        console.log rest + " ========="
         msg.send(toSend)
         if (rest.length)
           sendLogs(rest, msg)
