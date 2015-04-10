@@ -82,10 +82,25 @@ entitiesForUpdate = (string) ->
 entitiesForUpdateAndClose = (string) ->
   [entityIdsToUpdate, entityIdsToClose] = [[], []]
 
+  while match = updateRegex.exec(string)
+    # Note: below, close entities are always reported, while update
+    # entities are only reported if they haven't been linked in
+    # Github (since we only want to update an entity once if it's just
+    # mentioned).
+    if match[1].match updateVerbs
+      while entityMatch = entityRegex.exec(match[0]) when ! _.str.endsWith(entityMatch[0], ']')
+        entityIdsToUpdate.push entityMatch[2]
+    else if match[1].match closeVerbs
+      while entityMatch = entityRegex.exec(match[0])
+        entityIdsToClose.push entityMatch[2]
+
+
+  [entityIdsToUpdate, entityIdsToClosea]
+
 entitiesForUpdateAndReference = (string) ->
   [entityIdsToUpdate, entityIdsToReference] = [[], []]
 
-  while match = updateRegex.exec(string)
+   while match = updateRegex.exec(string)
     # Note: below, close entities are always reported, while update
     # entities are only reported if they haven't been linked in
     # Github (since we only want to update an entity once if it's just
@@ -96,12 +111,6 @@ entitiesForUpdateAndReference = (string) ->
     else if match[1].match referenceVerbs
       while entityMatch = entityRegex.exec(match[0]) when ! _.str.endsWith(entityMatch[0], ']')
         entityIdsToReference.push entityMatch[2]
-    else if match[1].match closeVerbs
-      while entityMatch = entityRegex.exec(match[0])
-        entityIdsToClose.push entityMatch[2]
-
-
-  [entityIdsToUpdate, entityIdsToClose, entityIdsToReference]
 
 # Updates the specified body with links to the specified ids if they are
 # referenced anywhere without already being linked.
