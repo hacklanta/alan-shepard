@@ -80,7 +80,10 @@ entitiesForUpdate = (string) ->
 # TargetProcess entity to a "Fixed" state (for bugs) or a "Done" state
 # (for user stories and tasks).
 entitiesForUpdateAndClose = (string) ->
-  [entityIdsToUpdate, entityIdsToClose, entityIdsToReference] = [[], [], []]
+  [entityIdsToUpdate, entityIdsToClose] = [[], []]
+
+entitiesForUpdateAndReference = (string) ->
+  [entityIdsToUpdate, entityIdsToReference] = [[], []]
 
   while match = updateRegex.exec(string)
     # Note: below, close entities are always reported, while update
@@ -161,7 +164,7 @@ module.exports = (robot) ->
             .concat entitiesForUpdateAndClose(payload.pull_request.body)
         else if payload.pull_request?
           [payload.pull_request, addLinksToPullRequest(payload.pull_request.url, payload.pull_request.body),
-            entitiesForUpdate(payload.pull_request.body), []]
+            entitiesForUpdateAndReference(payload.pull_request.body), []]
         else if payload.comment?
           [payload.issue, addLinksToComment(payload.comment.url, payload.comment.id, payload.comment.body),
             entitiesForUpdate(payload.comment.body), []]
