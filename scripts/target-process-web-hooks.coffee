@@ -111,7 +111,7 @@ entitiesForUpdateAndReference = (string) ->
       while entityMatch = entityRegex.exec(match[0]) when ! _.str.endsWith(entityMatch[0], ']')
         entityIdsToReference.push entityMatch[2]
 
-  [entityIdsToUpdate, entityIdsToClose]
+  [entityIdsToUpdate, entityIdsToReference]
 
 # Updates the specified body with links to the specified ids if they are
 # referenced anywhere without already being linked.
