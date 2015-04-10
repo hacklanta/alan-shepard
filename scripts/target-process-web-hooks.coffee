@@ -8,7 +8,8 @@ TARGET_PROCESS_HOST = process.env['TARGET_PROCESS_HOST']
 GITHUB_TOKEN = process.env['GITHUB_TOKEN']
 
 closeVerbs = ///#{['fix(?:e[sd])?','close[sd]?','complete[sd]?','resolve[sd]?','implement(?:s|ed)?'].join('|')}///i
-updateVerbs = ///#{['update[sd]?','improve[sd]?','address(?:e[sd])?','re(?:f(?:erence)?(?:s)?)?','see'].join('|')}///i
+updateVerbs = ///#{['update[sd]?','improve[sd]?','address(?:e[sd])?'].join('|')}///i
+referenceVerbs = ///#{['re(?:f(?:erence)?(?:s)?)?','see'].join('|')}///i
 
 inProgressStateByType =
   UserStories:
@@ -53,7 +54,8 @@ updateRegex =
   ///
     ( # change verbs
       #{closeVerbs.source}|
-      #{updateVerbs.source}
+      #{updateVerbs.source}|
+      #{referenceVerbs}
     )
     \s+ # at least one space
     (?: # 1+ entities
@@ -78,7 +80,7 @@ entitiesForUpdate = (string) ->
 # TargetProcess entity to a "Fixed" state (for bugs) or a "Done" state
 # (for user stories and tasks).
 entitiesForUpdateAndClose = (string) ->
-  [entityIdsToUpdate, entityIdsToClose] = [[], []]
+  [entityIdsToUpdate, entityIdsToClose, entityIdsToReference] = [[], [], []]
 
   while match = updateRegex.exec(string)
     # Note: below, close entities are always reported, while update
@@ -88,12 +90,15 @@ entitiesForUpdateAndClose = (string) ->
     if match[1].match updateVerbs
       while entityMatch = entityRegex.exec(match[0]) when ! _.str.endsWith(entityMatch[0], ']')
         entityIdsToUpdate.push entityMatch[2]
+    else if match[1].match referenceVerbs
+      while entityMatch = entityRegex.exec(match[0]) when ! _.str.endsWith(entityMatch[0], ']')
+        entityIdsToReference.push entityMatch[2]
     else if match[1].match closeVerbs
       while entityMatch = entityRegex.exec(match[0])
         entityIdsToClose.push entityMatch[2]
 
 
-  [entityIdsToUpdate, entityIdsToClose]
+  [entityIdsToUpdate, entityIdsToClose, entityIdsToReference]
 
 # Updates the specified body with links to the specified ids if they are
 # referenced anywhere without already being linked.
@@ -148,7 +153,7 @@ module.exports = (robot) ->
       payload = JSON.parse req.param('payload')
 
       [{number: issueNumber, title: issueTitle, html_url: issueUrl},
-       linkAdderFn, entityIdsToUpdate, entityIdsToClose] =
+       linkAdderFn, entityIdsToUpdate, entityIdsToClose, entityIdsToReference] =
         if payload.pull_request?.merged_at and payload.action == 'closed'
           # Only close entities if the pull request has been merged and
           # we're closing it.
@@ -193,6 +198,23 @@ module.exports = (robot) ->
               ],
               (err, result, body) -> console.log "What? Got dat", body
 
+        for id in entityIdsToReference
+          # Always post to UserStories--it doesn't matter, the comment
+          # will go through to the appropriate entity anyway.
+          targetProcess.post "UserStories/#{id}/Comments", updateComment,
+              (err, result, body) -> console.log "What? Got dat", body
+          # For these, we fire off one POST to each entity type so the right one will take effect.
+          for entityType in ['UserStories','Bugs','Tasks']
+            targetProcess.post "#{entityType}/#{id}",
+              Id: id
+              CustomFields: [
+                Name: "Pull Request"
+                Value:
+                  Url: issueUrl
+                  Label: "##{issueNumber}: #{issueTitle}"
+              ],
+              (err, result, body) -> console.log "What? Got dat", body
+
         closeComment =
           [
             Description:
@@ -220,9 +242,9 @@ module.exports = (robot) ->
               ],
               (err, result, body) -> console.log "What? Got dat", body
 
-        linkAdderFn(robot, issueNumber, entityIdsToUpdate)
+        linkAdderFn(robot, issueNumber, entityIdsToUpdate, entityIdsToReference)
 
-        res.send 200, "Fired off requests to update #{entityIdsToUpdate} and close #{entityIdsToClose} from PR #{issueNumber}."
+        res.send 200, "Fired off requests to update #{entityIdsToUpdate}, reference #{entityIdsToReference} and close #{entityIdsToClose} from PR #{issueNumber}."
       else
         res.send 400, "Expected an issue id but could not find one."
 
