@@ -255,7 +255,7 @@ module.exports = (robot) ->
               ],
               (err, result, body) -> console.log "What? Got dat", body
 
-        linkAdderFn(robot, issueNumber, entityIdsToUpdate, entityIdsToReference)
+        linkAdderFn(robot, issueNumber, entityIdsToUpdate)
 
         res.send 200, "Fired off requests to update #{entityIdsToUpdate}, reference #{entityIdsToReference} and close #{entityIdsToClose} from PR #{issueNumber}."
       else
