@@ -55,7 +55,7 @@ updateRegex =
     ( # change verbs
       #{closeVerbs.source}|
       #{updateVerbs.source}|
-      #{referenceVerbs}
+      #{referenceVerbs.source}
     )
     \s+ # at least one space
     (?: # 1+ entities
