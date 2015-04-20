@@ -5,10 +5,12 @@
 #   mandrill-api
 #
 # Configuration:
-#   MANDRILL_TOKEN - Mandrill API Auth token 
+#   MANDRILL_TOKEN - List of name:token pairs. Example "prod:123456,staging:98754678,dev:1234111222"
 #
 # Commands:
+#   hubot (I'm|I'm|Im|I am) missing (an) email - Show current backlog for hubot accounts
 #   hubot (mandrill|email) (blacklog|queue) - Show current backlog for hubot accounts
+#   hubot find email (with|that contains) {name, subject, text, etc} - Searches today's emails and displays matches. Supports specified search terms. Subject:{text}, email{text}, etc
 #
 # Author: 
 #   @riveramj
@@ -31,13 +33,19 @@ module.exports = (robot) ->
         client[1].users.info {}, (user) ->
           msg.send "#{client[0]} : #{user.backlog}"
 
+  robot.respond /(I'm|I'm|Im|I am)\s?missing (an )?email/i, (msg) ->
+    msg.send "Looking to see if it's in the backlog."
+    getUsersForAllAccounts msg
+
   robot.respond /(mandrill|email) (backlog|queue)/i, (msg) ->
+    msg.send "Retrieving backlog. This may take a second."
     getUsersForAllAccounts msg
 
   robot.respond /find email (?:with|that contains) (.*)/i, (msg) ->
     query = msg.match[1].trim()
-    dateFrom = "2015-04-17"
-    dateTo = "2015-04-17"
+    todayDate = new Date().toISOString().replace(/T.*/,'')
+    dateFrom = todayDate
+    dateTo = todayDate
 
     mandrillClients[0][1].messages.search {"query": query, "date_from": dateFrom, "date_to": dateTo}, (emails)  ->
       if emails.length > 0
