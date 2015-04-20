@@ -52,12 +52,18 @@ module.exports = (robot) ->
         for email in emails
           do (email) ->
             date = new Date(email.ts * 1000)
+            opened = if email.opens > 0
+                      "yes"
+                     else
+                      "no"
+
             msg.send """
               to: #{email.email}
               subject: #{email.subject}
               sent: #{date}
               state: #{email.state}
               account: #{email.subaccount}
+              opened: #{opened}
             """
       else
         msg.send "Did not find any emails"
