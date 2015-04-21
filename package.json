@@ -34,7 +34,8 @@
     "underscore.string": "2.3.3",
     "hubot-tell": "*",
     "hubot-targetprocess": "*",
-    "hubot-shipit": "*"
+    "hubot-shipit": "*",
+    "hubot-mandrill": "*"
   },
   "engines": {
     "node": ">= 0.8.x",
