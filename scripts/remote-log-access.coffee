@@ -34,18 +34,25 @@ module.exports = (robot) ->
     else
       msg.send "Did not find any results"
 
-  robot.respond /tail ([0-9]*) from (dev|router-dev|router-stg|stg) (portal|rica|scribe|fabric)/i, (msg) ->
+  robot.respond /tail ([0-9]*) from ([A-z\-]*) ([A-z\-]*)/i, (msg) ->
+    validEnvironments = /portal|rica|scribe|fabric/i
+    validServers = /dev|router-dev|router-stg|stg/i
+
     tailAmount = msg.match[1]
     env = msg.match[2]
     server = msg.match[3]
-
-    msg.send("Fetching lines from the log. Don't panic this may take a moment:")
  
-    exec = require('child_process').exec
-
-    exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C tail -N #{tailAmount} -E #{env} -S #{server}", (err, stdout, stderr)->
-      processLogResults(stdout, msg)
-
+    if !env.match validEnvironments
+      msg.send "Valid environments are: portal|rica|scribe|fabric"
+    else if !server.match validServers
+      msg.send "Valid servers are: dev|router-dev|router-stg|stg"
+    else
+      msg.send "Fetching lines from the log. Don't panic this may take a moment:"
+  
+      exec = require('child_process').exec
+  
+      exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C tail -N #{tailAmount} -E #{env} -S #{server}", (err, stdout, stderr)->
+        processLogResults(stdout, msg)
 
   robot.respond /grep "?(.*)"? from (dev|router-dev|router-stg|stg) (portal|rica|scribe|fabric)/i, (msg) ->
     searchValue = msg.match[1]
