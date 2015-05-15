@@ -43,9 +43,15 @@ module.exports = (robot) ->
     server = msg.match[3]
  
     if !env.match validEnvironments
-      msg.send "Valid environments are: portal|rica|scribe|fabric"
+      msg.send """
+        Bad environment #{env}
+        Valid environments are: portal|rica|scribe|fabric
+        """
     else if !server.match validServers
-      msg.send "Valid servers are: dev|router-dev|router-stg|stg"
+      msg.send """
+        Bad server: #{server}
+        Valid servers are: dev|router-dev|router-stg|stg
+        """
     else
       msg.send "Fetching lines from the log. Don't panic this may take a moment:"
   
