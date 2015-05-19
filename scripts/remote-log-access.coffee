@@ -39,8 +39,8 @@ module.exports = (robot) ->
     validEnvironments = /dev|router-dev|router-stg|stg/i
 
     tailAmount = msg.match[1]
-    server = msg.match[2]
-    env = msg.match[3]
+    env = msg.match[2]
+    server = msg.match[3]
  
     if !env.match validEnvironments
       msg.send """
