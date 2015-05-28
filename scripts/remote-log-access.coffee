@@ -9,7 +9,7 @@
 #
 # Commands:
 #   hubot tail {number of lines} from {dev|stg|router-dev|router-stg} {portal|scribe|fabric|rica} - runs tail command on current log from the server and env given
-#   hubot grep {search string} from {dev|stg|router-dev|router-stg} {portal|scribe|fabric|rica} - runs grep -i command on current log from the server and env given
+#   hubot grep [-A #, -B #, -C #] {search string} from {dev|stg|router-dev|router-stg} {portal|scribe|fabric|rica} - runs grep -i command on current log from the server and env given. Before, After and Context flags are supported.
 # 
 # Author: 
 #   @riveramj Mike Rivera
