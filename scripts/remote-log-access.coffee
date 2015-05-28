@@ -9,7 +9,7 @@
 #
 # Commands:
 #   hubot tail {number of lines} from {dev|stg|router-dev|router-stg} {portal|scribe|fabric|rica} - runs tail command on current log from the server and env given
-#   hubot grep {search string} from {dev|stg|router-dev|router-stg} {portal|scribe|fabric|rica} - runs grep -i command on current log from the server and env given
+#   hubot grep [-A #, -B #, -C #] {search string} from {dev|stg|router-dev|router-stg} {portal|scribe|fabric|rica} - runs grep -i command on current log from the server and env given. Before, After and Context flags are supported.
 # 
 # Author: 
 #   @riveramj Mike Rivera
@@ -60,14 +60,31 @@ module.exports = (robot) ->
       exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C tail -N #{tailAmount} -E #{env} -S #{server}", (err, stdout, stderr)->
         processLogResults(stdout, msg)
 
-  robot.respond /grep "?(.*)"? from (dev|router-dev|router-stg|stg) (portal|rica|scribe|fabric)/i, (msg) ->
-    searchValue = msg.match[1]
-    env = msg.match[2]
-    server = msg.match[3]
+  robot.respond /grep ((?:-(?:[ABC]?) (?:[0-9]+)\s*)*)\s*"?(.*)"? from (dev|router-dev|router-stg|stg) (portal|rica|scribe|fabric)/i, (msg) ->
+    rawFlags = msg.match[1]
+    flags = rawFlags.split('-').splice(1)
+
+    after = ''
+    before = ''
+    context = ''
+
+    extractNumberOfLines = (flag) ->
+      flag.replace(/\D+/g, '')
+
+    for flag in flags
+      switch flag.charAt(0).toLowerCase()
+        when "a" then after = extractNumberOfLines flag
+        when "b" then before = extractNumberOfLines flag
+        when "c" then context = extractNumberOfLines flag
+        else msg.send "no match for flag'" + flag + "'"
+
+    searchValue = msg.match[2]
+    env = msg.match[3]
+    server = msg.match[4]
 
     msg.send("Fetching lines from the log. Don't panic this may take a moment:")
  
     exec = require('child_process').exec
 
-    exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C grep -V '#{searchValue}' -E #{env} -S #{server}", (err, stdout, stderr) ->
+    exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C grep -A '#{after}' -B '#{before}' -X '#{context}' -V '#{searchValue}' -E #{env} -S #{server}", (err, stdout, stderr) ->
       processLogResults(stdout, msg)
