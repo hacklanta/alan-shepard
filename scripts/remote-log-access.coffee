@@ -35,17 +35,17 @@ module.exports = (robot) ->
       msg.send "Did not find any results"
 
   robot.respond /tail ([0-9]*) from ([A-z\-]*) ([A-z\-]*)/i, (msg) ->
-    validEnvironments = /dev|router-dev|router-stg|stg/i
-    validServers = /portal|rica|scribe|fabric/i
+    validEnvironments = /^dev$|^router-dev$|^router-stg$|^stg$|^dublin-stg$/i
+    validServers = /^portal$|^rica$|^scribe$|^fabric$/i
 
     tailAmount = msg.match[1]
     env = msg.match[2]
     server = msg.match[3]
- 
+
     if !(env.match validEnvironments)
       msg.send """
         Bad environment #{env}
-        Valid environments are: dev|router-dev|router-stg|stg
+        Valid environments are: dev|router-dev|router-stg|stg or dublin-stg
         """
     else if !(server.match validServers)
       msg.send """
