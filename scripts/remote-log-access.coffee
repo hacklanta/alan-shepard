@@ -60,7 +60,7 @@ module.exports = (robot) ->
       exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C tail -N #{tailAmount} -E #{env} -S #{server}", (err, stdout, stderr)->
         processLogResults(stdout, msg)
 
-  robot.respond /grep ((?:-(?:[ABC]?) (?:[0-9]+)\s*)*)\s*"?([A-z0-9\.\-]*)"? from (dev|router-dev|router-stg|stg|dublin-stg) (portal|rica|scribe|fabric)/i, (msg) ->
+  robot.respond /grep ((?:-(?:[ABC]?) (?:[0-9]+)\s*)*)\s*"?([A-z0-9\.\-\(\)\[\]]*)"? from (dev|router-dev|router-stg|stg|dublin-stg) (portal|rica|scribe|fabric)/i, (msg) ->
     rawFlags = msg.match[1]
     flags = rawFlags.split('-').splice(1)
 
