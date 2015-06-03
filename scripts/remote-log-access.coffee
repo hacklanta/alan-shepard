@@ -17,6 +17,30 @@
 
 module.exports = (robot) ->
 
+  validEnvironments = /^dev$|^router-dev$|^router-stg$|^stg$|^dublin-stg$/i
+  validServers = /^portal$|^rica$|^scribe$|^fabric$/i
+
+  environmentIsValid = (environment, msg) ->
+    if environment.match validEnvironments
+      true
+    else
+      msg.send """
+        Bad environment #{environment}
+        Valid environments are: dev|router-dev|router-stg|stg or dublin-stg
+      """
+      false
+
+
+  serverIsValid = (server, msg) ->
+    if server.match validServers
+      true
+    else
+      msg.send """
+        Bad server: #{server}
+        Valid servers are: portal|rica|scribe|fabric 
+      """
+      false
+
   sendLogs = (remainingLogs, msg) ->
       [toSend, rest...] = remainingLogs
       doSend = ->
@@ -42,17 +66,7 @@ module.exports = (robot) ->
     env = msg.match[2]
     server = msg.match[3]
 
-    if !(env.match validEnvironments)
-      msg.send """
-        Bad environment #{env}
-        Valid environments are: dev|router-dev|router-stg|stg or dublin-stg
-        """
-    else if !(server.match validServers)
-      msg.send """
-        Bad server: #{server}
-        Valid servers are: portal|rica|scribe|fabric 
-        """
-    else
+    if environmentIsValid(env,msg) & serverIsValid(server, msg)
       msg.send "Fetching lines from the log. Don't panic this may take a moment:"
   
       exec = require('child_process').exec
@@ -60,7 +74,7 @@ module.exports = (robot) ->
       exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C tail -N #{tailAmount} -E #{env} -S #{server}", (err, stdout, stderr)->
         processLogResults(stdout, msg)
 
-  robot.respond /grep ((?:-(?:[ABC]?) (?:[0-9]+)\s*)*)\s*"?([A-z0-9\.\-\(\)\[\]]*)"? from (dev|router-dev|router-stg|stg|dublin-stg) (portal|rica|scribe|fabric)/i, (msg) ->
+  robot.respond /grep ((?:-(?:[ABC]?) (?:[0-9]+)\s*)*)\s*"?([A-z0-9\.\-\(\)\[\]]*)"? from ([A-z\-]*) ([A-z\-]*)/i, (msg) ->
     rawFlags = msg.match[1]
     flags = rawFlags.split('-').splice(1)
 
@@ -82,9 +96,10 @@ module.exports = (robot) ->
     env = msg.match[3]
     server = msg.match[4]
 
-    msg.send("Fetching lines from the log. Don't panic this may take a moment:")
- 
-    exec = require('child_process').exec
+    if environmentIsValid(env,msg) & serverIsValid(server, msg)
+      msg.send("Fetching lines from the log. Don't panic this may take a moment:")
 
-    exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C grep -A '#{after}' -B '#{before}' -X '#{context}' -V '#{searchValue}' -E #{env} -S #{server}", (err, stdout, stderr) ->
-      processLogResults(stdout, msg)
+      exec = require('child_process').exec
+
+      exec "bash /home/jenkins/scripts/jenkins-log-access.sh -C grep -A '#{after}' -B '#{before}' -X '#{context}' -V '#{searchValue}' -E #{env} -S #{server}", (err, stdout, stderr) ->
+        processLogResults(stdout, msg)
