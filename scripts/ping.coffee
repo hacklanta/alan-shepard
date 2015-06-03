@@ -48,8 +48,8 @@ phrases = [
 randomPhrase = -> phrases[Math.floor(Math.random() * phrases.length)]
 
 module.exports = (robot) ->
-  robot.hear ///(?:.+)\s+#{robot.name}(?:.*)///i, (msg) ->
-    msg.send randomPhrase ->
+  #robot.hear ///(?:.+)\s+#{robot.name}(?:.*)///i, (msg) ->
+  # msg.send randomPhrase ->
 
   robot.respond /ping/i, (msg) ->
     msg.send randomPhrase ->
