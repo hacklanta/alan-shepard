@@ -66,7 +66,7 @@ module.exports = (robot) ->
     env = msg.match[2]
     server = msg.match[3]
 
-    if environmentIsValid(env,msg) & serverIsValid(server, msg)
+    if serverIsValid(server, msg) & environmentIsValid(env,msg)
       msg.send "Fetching lines from the log. Don't panic this may take a moment:"
   
       exec = require('child_process').exec
@@ -96,7 +96,7 @@ module.exports = (robot) ->
     env = msg.match[3]
     server = msg.match[4]
 
-    if environmentIsValid(env,msg) & serverIsValid(server, msg)
+    if serverIsValid(server, msg) & environmentIsValid(env,msg)
       msg.send("Fetching lines from the log. Don't panic this may take a moment:")
 
       exec = require('child_process').exec
