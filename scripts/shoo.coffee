@@ -8,6 +8,7 @@
 #   None
 #
 # Commands:
+#   hubot shoo {user} - Hubot will send a get out gif the next time someone says something
 #
 # Author:
 #   @farmdawgnation
@@ -16,12 +17,19 @@ toShoo = []
 
 module.exports = (robot) ->
   robot.respond /shoo (.+)$/i, (msg) ->
-    toShoo.push msg.match[1]
-    msg.send "Got it. Will shoo #{msg.match[1]}"
+    name = msg.match[1].toLowerCase()
+
+    if name.indexOf("@") == 0
+      name = name.substring(1, name.length)
+    
+    toShoo.push
+    msg.send "Got it. Will shoo #{name}"
 
   robot.hear /.*/, (msg) ->
-    if toShoo.indexOf(msg.message.user.name) != -1
-      msg.send "@#{msg.message.user.name}, http://www.gifsforum.com/images/gif/get%20out/grand/get-out-eccbc87e4b5ce2fe28308fd9f2a7baf3-192.gif"
+    console.log msg.message.user.name.toLowerCase()
+
+    if toShoo.indexOf(msg.message.user.name.toLowerCase()) != -1
+      msg.send "@#{msg.message.user.name}, http://media.giphy.com/media/FmsOcKwVAFwUo/giphy.gif"
 
       toShoo = toShoo.filter (value) ->
         value != msg.message.user.name
