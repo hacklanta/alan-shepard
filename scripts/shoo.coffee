@@ -30,4 +30,4 @@ module.exports = (robot) ->
       msg.send "@#{msg.message.user.name}, http://media.giphy.com/media/FmsOcKwVAFwUo/giphy.gif"
 
       toShoo = toShoo.filter (value) ->
-        value != msg.message.user.name
+        value != msg.message.user.name.toLowerCase()
