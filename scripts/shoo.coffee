@@ -22,12 +22,10 @@ module.exports = (robot) ->
     if name.indexOf("@") == 0
       name = name.substring(1, name.length)
     
-    toShoo.push
+    toShoo.push name
     msg.send "Got it. Will shoo #{name}"
 
   robot.hear /.*/, (msg) ->
-    console.log msg.message.user.name.toLowerCase()
-
     if toShoo.indexOf(msg.message.user.name.toLowerCase()) != -1
       msg.send "@#{msg.message.user.name}, http://media.giphy.com/media/FmsOcKwVAFwUo/giphy.gif"
 
