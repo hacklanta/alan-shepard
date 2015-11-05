@@ -23,7 +23,7 @@
     "flip": "~0.1.0",
     "githubot": "0.5.0",
     "hubot": "^2.11.4",
-    "hubot-flowdock": ">=0.5.0",
+    "hubot-slack": "*",
     "hubot-gif-locker": "*",
     "hubot-scripts": ">= 2.5.0 < 3.0.0",
     "hubot-yardmaster": "*",
@@ -38,7 +38,7 @@
     "hubot-mandrill": "*"
   },
   "engines": {
-    "node": ">= 0.8.x",
+    "node": "0.12.x",
     "npm": ">= 1.1.x"
   }
 }
