@@ -1,1 +1,1 @@
-web: bin/hubot -a flowdock -n Alan
+web: bin/hubot -a slack
